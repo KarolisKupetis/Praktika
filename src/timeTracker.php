@@ -1,7 +1,7 @@
 <?php
 namespace first;
 
-class timeTracker implements TimeTrackInterface
+class timeTracker
 {
     private $startTime;
     private $endTime;
@@ -17,12 +17,8 @@ class timeTracker implements TimeTrackInterface
         $this->endTime = microtime(true);
     }
 
-    public function stopTrack()
-    {
-        $this->timePassed =($this->startTime - $this->endTime) / 60;
-    }
     public function getElapsedTime()
     {
-        return $this->timePassed;
+        return $this->timePassed =($this->endTime-$this->startTime) / 60;
     }
 }

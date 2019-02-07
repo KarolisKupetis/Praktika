@@ -1,6 +1,4 @@
 <?php
-
-
 namespace first;
 
 class inputLoader

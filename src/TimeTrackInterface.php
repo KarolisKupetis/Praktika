@@ -1,10 +1,8 @@
 <?php
-namespace first;
 
-
-interface TimeTrackInterface
+interface TimeTrackInterfaces
 {
      public function startTrackingTime();
      public function endTrackingTime();
-     public function stopTrack();
+     public function getElapsedTime();
 }
