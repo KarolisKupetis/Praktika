@@ -3,7 +3,10 @@
 
 namespace first;
 
-interface inputLoader
+class inputLoader
 {
-    public function getUserInput();
+    public function getUserInput()
+    {
+        return trim(fgets(STDIN));
+    }
 }

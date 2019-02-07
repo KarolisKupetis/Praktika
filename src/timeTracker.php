@@ -1,7 +1,6 @@
 <?php
 namespace first;
 
-
 class timeTracker implements TimeTrackInterface
 {
     private $startTime;

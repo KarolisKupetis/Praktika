@@ -1,7 +1,7 @@
 <?php
 namespace first;
 
-class Hyphenator extends timeTracker
+class Hyphenator
 {
     private function  arrayToHyphenatedWord(Array $array)
     {
