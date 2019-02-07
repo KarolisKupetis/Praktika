@@ -2,11 +2,11 @@
 namespace first;
 
 
-class timeTracker
+class timeTracker implements TimeTrackInterface
 {
-    protected $startTime=0;
-    protected $endTime=0;
-    protected $timePassed=0;
+    private $startTime;
+    private $endTime;
+    private $timePassed=0;
 
     public function startTrackingTime()
     {
@@ -18,8 +18,12 @@ class timeTracker
         $this->endTime = microtime(true);
     }
 
-    public function getPassedTime()
+    public function stopTrack()
     {
         $this->timePassed =($this->startTime - $this->endTime) / 60;
+    }
+    public function getElapsedTime()
+    {
+        return $this->timePassed;
     }
 }

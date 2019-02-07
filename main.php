@@ -1,18 +1,16 @@
 <?php
-
 foreach (glob('src/*.php') as $filename)
 {
     include $filename;
 }
 
-$inputLine = trim(fgets(STDIN));
+    define('darboPradziosLaikas', date('h:i:s'));
 
-$reader = new \first\fileReader();
-$syllables = $reader->readFile('tekstas');
+    $inputLine = trim(fgets(STDIN));
 
-
-$hyp = new first\Hyphenator();
-echo $hyp->hyphenateWord($inputLine,$syllables);
+    $reader = new \first\fileReader();
+    $syllables = $reader->readFile('tekstas');
 
 
-
+    $hyp = new first\Hyphenator();
+    echo $hyp->hyphenateWord($inputLine, $syllables);
