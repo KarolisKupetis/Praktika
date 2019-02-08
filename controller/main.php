@@ -1,18 +1,18 @@
 <?php
-foreach (glob('src/*.php') as $filename)
-{
-    include $filename;
-}
-    define('darboPradziosLaikas', date('h:i:s'));
+require '../vendor/autoload.php';
 
-    $inputLoader = new \first\inputLoader();
-    $reader = new \first\fileReader();
-    $hyp = new first\Hyphenator();
-    $timeTracker = new \first\timeTracker();
+    define('BEGINTIME', date('h:i:s'));
+
+    $inputLoader = new Reader\inputLoader();
+
+    $reader = new Reader\fileReader();
+    $hyp = new Logic\Hyphenator\Hyphenator();
+    $timeTracker = new Helper\timeTracker();
 
     $syllables = $reader->readFile('tekstas');
 
     $run = true;
+
     while($run)
     {
         echo "1. Ivesti zodi ir ji suskiemenuoti\n";

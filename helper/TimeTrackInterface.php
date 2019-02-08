@@ -1,6 +1,8 @@
 <?php
 
-interface TimeTrackInterfaces
+namespace Helper;
+
+interface TimeTrackInterface
 {
      public function startTrackingTime();
      public function endTrackingTime();

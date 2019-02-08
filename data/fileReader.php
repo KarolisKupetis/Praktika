@@ -1,8 +1,6 @@
 <?php
 
-
-namespace first;
-
+namespace Reader;
 
 class fileReader
 {

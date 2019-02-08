@@ -1,6 +1,5 @@
 <?php
-namespace first;
-
+namespace Reader;
 
 class writerToFile
 {

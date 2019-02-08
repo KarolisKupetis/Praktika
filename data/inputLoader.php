@@ -1,5 +1,5 @@
 <?php
-namespace first;
+namespace Reader;
 
 class inputLoader
 {
