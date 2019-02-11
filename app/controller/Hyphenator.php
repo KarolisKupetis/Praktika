@@ -2,14 +2,26 @@
 
 namespace App\Controller;
 
+use App\helper\LoggerCreator;
+
 class Hyphenator
 {
-    private function isSyllableInString($input, $syllable,$offset=null)
+
+    private $logger;
+
+    public function __construct()
+    {
+        $this->logger=LoggerCreator::getInstance();
+    }
+
+
+    private function isSyllableInString($input, $syllable, $offset = null)
     {
         $onlyLettersSyllable = preg_replace('/\d/', '', $syllable);
-        $foundPosition = strpos($input, $onlyLettersSyllable,$offset);
+        $foundPosition = strpos(strtolower($input), $onlyLettersSyllable, $offset);
 
         if ($foundPosition === false) {
+
             return false;
         }
 
@@ -20,21 +32,22 @@ class Hyphenator
     {
         $dotInput = '.' . $input . '.';
         $inputAsArray = str_split(implode(' ', str_split($dotInput)));
+        $iterationAmount=0;
+        $this->logger->addToMessage(' Patterns:{');
 
         foreach ($patternsArray as $syllable) {
+            $iterationAmount++;
             $syllablePlace = $this->isSyllableInString($dotInput, $syllable);
 
-            while($syllablePlace){
-
-                if ($syllablePlace !== false) {
-                    $spaceIndexInWord = $syllablePlace * 2 + 1;
-                    $inputAsArray = $this->updateArrayNumbers($spaceIndexInWord, $inputAsArray, $syllable);
-                }
-
-                $syllablePlace = $this->isSyllableInString($dotInput, $syllable,$syllablePlace+1);
+            while ($syllablePlace !== false) {
+                $this->logger->addToMessage($syllable.' ');
+                $spaceIndexInWord = $syllablePlace * 2 + 1;
+                $inputAsArray = $this->updateArrayNumbers($spaceIndexInWord, $inputAsArray, $syllable);
+                $syllablePlace = $this->isSyllableInString($dotInput, $syllable, $syllablePlace + 1);
             }
 
         }
+        $this->logger->addToMessage('} Iteration amount: '.$iterationAmount.' ');
 
         return $this->arrayToHyphenatedWord($inputAsArray);
     }

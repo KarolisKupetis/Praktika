@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Helper\FileReader;
 use App\Helper\InputLoader;
+use App\helper\LoggerCreator;
 use App\Helper\TimeTracker;
 
 class Controller
@@ -12,13 +13,18 @@ class Controller
     private $inputLoader;
     private $fileReader;
     private $timeTracker;
+    private $logger;
 
-    function beginWork()
+    public function __construct()
     {
         $this->hyphenator = new Hyphenator();
         $this->inputLoader = new InputLoader();
         $this->fileReader = new FileReader();
         $this->timeTracker = new TimeTracker();
+        $this->logger=LoggerCreator::getInstance();
+    }
+    public function beginWork()
+    {
         $syllables = $this->fileReader->readFile('tekstas.txt');
         $run = true;
 
@@ -29,14 +35,12 @@ class Controller
 
             switch ($inputLine) {
                 case 1:
-                    echo 'Irasykite zodi: ';
-                    $inputLine=$this->inputLoader->getUserInput();
-                    $this->timeTracker->startTrackingTime();
 
-                    echo 'Suskiemenuotas zodis: '.$this->hyphenator->hyphenateWord($inputLine,$syllables);
-                    $this->timeTracker->endTrackingTime();
+                    $inputLine=$this->getInput();
 
-                    echo 'Trukme: '.$this->timeTracker->getElapsedTime() . "s\n\n";
+                    $result = $this->processInput($inputLine,$syllables);
+
+                    $this->processResult($result);
                     break;
                 case 2:
                     $run = false;
@@ -44,5 +48,36 @@ class Controller
             }
 
         }
+    }
+
+    private function getInput()
+    {
+        echo 'Zodis: ';
+        $inputLine=$this->inputLoader->getUserInput();
+        $this->timeTracker->startTrackingTime();
+        $this->logger->addToMessage('Given word: '.$inputLine);
+
+        return $inputLine;
+    }
+
+    private function processInput($inputLine, $syllables)
+    {
+        $result = $this->hyphenator->hyphenateWord($inputLine,$syllables);
+        $this->timeTracker->endTrackingTime();
+
+        return $result;
+    }
+
+    private function processResult($result)
+    {
+        echo 'Suskiemenuotas zodis: '.$result;
+
+        $elapsedTime = $this->timeTracker->getElapsedTime();
+
+        echo 'Trukme: '.$elapsedTime."\n\n";
+        $this->logger->addToMessage('Hyphened word: '.$result.' Time took: '.$elapsedTime);
+        $this->logger->logToFile();
+        $this->logger->clearLogMessage();
+
     }
 }
