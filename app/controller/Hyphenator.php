@@ -14,7 +14,6 @@ class Hyphenator
         $this->logger=LoggerCreator::getInstance();
     }
 
-
     private function isSyllableInString($input, $syllable, $offset = null)
     {
         $onlyLettersSyllable = preg_replace('/\d/', '', $syllable);

@@ -7,7 +7,7 @@ use App\Helper\InputLoader;
 use App\helper\LoggerCreator;
 use App\Helper\TimeTracker;
 
-class Controller
+class HyphenateController
 {
     private $hyphenator;
     private $inputLoader;
@@ -21,8 +21,9 @@ class Controller
         $this->inputLoader = new InputLoader();
         $this->fileReader = new FileReader();
         $this->timeTracker = new TimeTracker();
-        $this->logger=LoggerCreator::getInstance();
+        $this->logger = LoggerCreator::getInstance();
     }
+
     public function beginWork()
     {
         $syllables = $this->fileReader->readFile('tekstas.txt');
@@ -36,9 +37,9 @@ class Controller
             switch ($inputLine) {
                 case 1:
 
-                    $inputLine=$this->getInput();
+                    $inputLine = $this->getInput();
 
-                    $result = $this->processInput($inputLine,$syllables);
+                    $result = $this->processInput($inputLine, $syllables);
 
                     $this->processResult($result);
                     break;
@@ -53,16 +54,16 @@ class Controller
     private function getInput()
     {
         echo 'Zodis: ';
-        $inputLine=$this->inputLoader->getUserInput();
+        $inputLine = $this->inputLoader->getUserInput();
         $this->timeTracker->startTrackingTime();
-        $this->logger->addToMessage('Given word: '.$inputLine);
+        $this->logger->addToMessage('Given word: ' . $inputLine);
 
         return $inputLine;
     }
 
     private function processInput($inputLine, $syllables)
     {
-        $result = $this->hyphenator->hyphenateWord($inputLine,$syllables);
+        $result = $this->hyphenator->hyphenateWord($inputLine, $syllables);
         $this->timeTracker->endTrackingTime();
 
         return $result;
@@ -70,12 +71,12 @@ class Controller
 
     private function processResult($result)
     {
-        echo 'Suskiemenuotas zodis: '.$result;
+        echo 'Suskiemenuotas zodis: ' . $result;
 
         $elapsedTime = $this->timeTracker->getElapsedTime();
 
-        echo 'Trukme: '.$elapsedTime."\n\n";
-        $this->logger->addToMessage('Hyphened word: '.$result.' Time took: '.$elapsedTime);
+        echo 'Trukme: ' . $elapsedTime . "\n\n";
+        $this->logger->addToMessage('Hyphened word: ' . $result . ' Time took: ' . $elapsedTime);
         $this->logger->logToFile();
         $this->logger->clearLogMessage();
 

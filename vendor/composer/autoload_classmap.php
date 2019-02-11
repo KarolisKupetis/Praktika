@@ -6,7 +6,7 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'App\\Controller\\Controller' => $baseDir . '/app/controller/Controller.php',
+    'App\\Controller\\HyphenateController' => $baseDir . '/app/controller/HyphenateController.php',
     'App\\Controller\\Hyphenator' => $baseDir . '/app/controller/Hyphenator.php',
     'App\\Helper\\FileReader' => $baseDir . '/app/helper/FileReader.php',
     'App\\Helper\\InputLoader' => $baseDir . '/app/helper/InputLoader.php',
@@ -14,6 +14,7 @@ return array(
     'App\\Helper\\TimeTracker' => $baseDir . '/app/helper/TimeTracker.php',
     'App\\Helper\\WriterToFile' => $baseDir . '/app/helper/WriterToFile.php',
     'App\\helper\\LoggerCreator' => $baseDir . '/app/helper/LoggerCreator.php',
+    'App\\helper\\strToPreg' => $baseDir . '/app/helper/strToPreg.php',
     'Monolog\\ErrorHandler' => $vendorDir . '/monolog/monolog/src/Monolog/ErrorHandler.php',
     'Monolog\\Formatter\\ChromePHPFormatter' => $vendorDir . '/monolog/monolog/src/Monolog/Formatter/ChromePHPFormatter.php',
     'Monolog\\Formatter\\ElasticaFormatter' => $vendorDir . '/monolog/monolog/src/Monolog/Formatter/ElasticaFormatter.php',
