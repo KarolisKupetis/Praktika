@@ -1,8 +1,8 @@
 <?php
 
-namespace Reader;
+namespace App\Helper;
 
-class fileReader
+class FileReader
 {
     public function readFile($fileName)
     {

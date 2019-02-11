@@ -1,10 +1,7 @@
 {
   "autoload": {
     "psr-4": {
-      "Reader\\": "data/",
-      "Controller\\": "controller/",
-      "Helper\\": "helper",
-      "Logic\\":"logic"
+      "App\\": "app"
     }
   }
 }

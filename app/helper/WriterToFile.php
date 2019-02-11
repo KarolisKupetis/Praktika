@@ -1,7 +1,7 @@
 <?php
-namespace Reader;
+namespace App\Helper;
 
-class writerToFile
+class WriterToFile
 {
     public function writeStringToFile($string)
     {

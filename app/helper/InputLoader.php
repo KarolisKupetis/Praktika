@@ -1,7 +1,7 @@
 <?php
-namespace Reader;
+namespace App\Helper;
 
-class inputLoader
+class InputLoader
 {
     public function getUserInput()
     {

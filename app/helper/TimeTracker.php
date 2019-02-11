@@ -1,8 +1,8 @@
 <?php
 
-namespace Helper;
+namespace App\Helper;
 
-class timeTracker implements TimeTrackInterface
+class TimeTracker implements TimeTrackInterface
 {
     private $startTime;
     private $endTime;
