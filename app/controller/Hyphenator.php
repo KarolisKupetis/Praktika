@@ -3,15 +3,18 @@
 namespace App\Controller;
 
 use App\helper\LoggerCreator;
+use App\Helper\TimeTracker;
 
 class Hyphenator
 {
 
     private $logger;
+    private $timeTracker;
 
     public function __construct()
     {
         $this->logger=LoggerCreator::getInstance();
+        $this->timeTracker=new TimeTracker();
     }
 
     private function isSyllableInString($input, $syllable, $offset = null)
@@ -29,6 +32,8 @@ class Hyphenator
 
     public function hyphenateWord($input, $patternsArray)
     {
+        $this->timeTracker->startTrackingTime();
+        $this->logger->addToMessage('Given Word : { '.$input.' }');
         $dotInput = '.' . $input . '.';
         $inputAsArray = str_split(implode(' ', str_split($dotInput)));
         $iterationAmount=0;
@@ -47,8 +52,12 @@ class Hyphenator
 
         }
         $this->logger->addToMessage('} Iteration amount: '.$iterationAmount.' ');
-
-        return $this->arrayToHyphenatedWord($inputAsArray);
+        $hyphenedWord = $this->arrayToHyphenatedWord($inputAsArray);
+        $this->timeTracker->endTrackingTime();
+        $elapsedTime = $this->timeTracker->getElapsedTime();
+        $this->logger->addToMessage('Hyphened word :{ '.$hyphenedWord.' }'.' Elapsed time: '.$elapsedTime);
+        $this->logger->logToFile();
+        return $hyphenedWord;
     }
 
     private function updateArrayNumbers($spaceIndexInWord, Array $inputAsArray, $syllable)
@@ -95,6 +104,10 @@ class Hyphenator
             }
         }
 
-        return implode('', $array) . "\n";
+        return implode('', $array);
     }
+
+
+
+
 }

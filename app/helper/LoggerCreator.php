@@ -30,6 +30,7 @@ class LoggerCreator
         $log = new Logger('my_app');
         $log->pushHandler(new StreamHandler('logger.txt',Logger::DEBUG));
         $log ->info($this->logMessage);
+        $this->clearLogMessage();
     }
 
     public function addToMessage($string)
