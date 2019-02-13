@@ -24,13 +24,7 @@ class HyphenateController
         $this->logger = LoggerCreator::getInstance();
     }
 
-    public function hyphenateOneWord($word)
-    {
-        $syllables = $this->fileReader->readFile('tekstas.txt');
-        $hyphenedWord = $this->hyphenator->hyphenateWord($word, $syllables);
 
-        return $hyphenedWord;
-    }
 
     public function beginWork()
     {
@@ -66,7 +60,7 @@ class HyphenateController
     private function logInput($inputToLog)
     {
         $this->timeTracker->startTrackingTime();
-        $this->logger->addToMessage('Given input: ' . implode($inputToLog));
+        $this->logger->addToMessage('Given input: ' . $inputToLog);
     }
 
     private function logOutput($result)
@@ -118,47 +112,47 @@ class HyphenateController
 
     private function hyphenateFile($fileName)
     {
-        $result = '';
+        $hyphenedFile = '';
         $fileContent = $this->fileReader->readFile($fileName);
-        $this->logInput($fileContent);
+        $this->logInput(implode($fileContent));
+
         foreach ($fileContent as $sentence) {
-            $sentenceAsArray = preg_split('/([^a-zA-Z])/u', $sentence, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
-
-            foreach ($sentenceAsArray as &$element) {
-
-                if ($this->isWord($element) === true) {
-                    $element = $this->hyphenateOneWord($element);
-                }
-            }
-            unset($element);
-            $result .= implode($sentenceAsArray) . "\n";
+            $hyphenedSentence = $this->hyphenateSentence($sentence);
+            $hyphenedFile .= $hyphenedSentence;
         }
 
-        return $result;
+        return $hyphenedFile;
     }
 
     private function hyphenateSentence($sentence)
     {
-        $sentenceAsArray = preg_split('/([^a-zA-Z])/u', $sentence, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+        $sentenceAsArray = preg_split('/([^a-zA-Z0-9])/u', $sentence, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+        $hyphenedSentence = $sentenceAsArray;
 
-        foreach ($sentenceAsArray as &$element) {
+        foreach ($sentenceAsArray as $key=>$element) {
 
             if ($this->isWord($element) === true) {
-                $element = $this->hyphenateOneWord($element);
+                $hyphenedSentence[$key] = $this->hyphenateOneWord($element);
             }
         }
-        unset($element);
-
-        return implode($sentenceAsArray) . "\n";
+        return implode($hyphenedSentence) . "\n";
     }
 
     private function isWord($subject)
     {
-        if (preg_match('/[a-zA-Z]/', $subject)) {
+        if (preg_match('/[^a-zA-Z]/', $subject)) {
 
-            return true;
+            return false;
         }
 
-        return false;
+        return true;
+    }
+
+    public function hyphenateOneWord($word)
+    {
+        $syllables = $this->fileReader->readFile('tekstas.txt');
+        $hyphenedWord = $this->hyphenator->hyphenateWord($word, $syllables);
+
+        return $hyphenedWord;
     }
 }

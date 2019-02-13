@@ -103,7 +103,7 @@ class Hyphenator
                 $arrayElement = '';
             }
         }
-
+        unset($arrayElement);
         return implode('', $array);
     }
 
