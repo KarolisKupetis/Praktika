@@ -13,8 +13,8 @@ class Hyphenator
 
     public function __construct()
     {
-        $this->logger=LoggerCreator::getInstance();
-        $this->timeTracker=new TimeTracker();
+        $this->logger = LoggerCreator::getInstance();
+        $this->timeTracker = new TimeTracker();
     }
 
     private function isSyllableInString($input, $syllable, $offset = null)
@@ -33,30 +33,30 @@ class Hyphenator
     public function hyphenateWord($input, $patternsArray)
     {
         $this->timeTracker->startTrackingTime();
-        $this->logger->addToMessage('Given Word : { '.$input.' }');
-        $dotInput = '.' . $input . '.';
-        $inputAsArray = str_split(implode(' ', str_split($dotInput)));
-        $iterationAmount=0;
+        $this->logger->addToMessage('Given Word : { ' . $input . ' }');
+        $dotInputdot = '.' . $input . '.';
+        $inputAsArray = str_split(implode(' ', str_split($dotInputdot)));
         $this->logger->addToMessage(' Patterns:{');
 
         foreach ($patternsArray as $syllable) {
-            $iterationAmount++;
-            $syllablePlace = $this->isSyllableInString($dotInput, $syllable);
+
+            $syllablePlace = $this->isSyllableInString($dotInputdot, $syllable);
 
             while ($syllablePlace !== false) {
-                $this->logger->addToMessage($syllable.' ');
+                $this->logger->addToMessage($syllable . ' ');
                 $spaceIndexInWord = $syllablePlace * 2 + 1;
                 $inputAsArray = $this->updateArrayNumbers($spaceIndexInWord, $inputAsArray, $syllable);
-                $syllablePlace = $this->isSyllableInString($dotInput, $syllable, $syllablePlace + 1);
+                $syllablePlace = $this->isSyllableInString($dotInputdot, $syllable, $syllablePlace + 1);
             }
 
         }
-        $this->logger->addToMessage('} Iteration amount: '.$iterationAmount.' ');
+        $this->logger->addToMessage('}');
         $hyphenedWord = $this->arrayToHyphenatedWord($inputAsArray);
         $this->timeTracker->endTrackingTime();
         $elapsedTime = $this->timeTracker->getElapsedTime();
-        $this->logger->addToMessage('Hyphened word :{ '.$hyphenedWord.' }'.' Elapsed time: '.$elapsedTime);
+        $this->logger->addToMessage('Hyphened word :{ ' . $hyphenedWord . ' }' . ' Elapsed time: ' . $elapsedTime);
         $this->logger->logToFile();
+
         return $hyphenedWord;
     }
 
@@ -70,6 +70,10 @@ class Hyphenator
             $isNotLastSpace = $spaceIndexInWord < count($inputAsArray) - 1;
             $isNotFirstSpace = $spaceIndexInWord > 1 + 2;
 
+            if (!$isNotFirstSpace && is_numeric($syllable[$syllableIndex])) {
+                $spaceIndexInWord -= 2;
+            }
+
             if ($isElementANumber && $isNotLastSpace && $isNotFirstSpace) {
                 $spaceIndexInWord -= 2;
 
@@ -78,10 +82,8 @@ class Hyphenator
                 }
 
             }
-
             $syllableIndex++;
             $spaceIndexInWord += 2;
-
         }
 
         return $inputAsArray;
@@ -104,10 +106,7 @@ class Hyphenator
             }
         }
         unset($arrayElement);
+
         return implode('', $array);
     }
-
-
-
-
 }

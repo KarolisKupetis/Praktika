@@ -20,7 +20,7 @@ class TimeTracker implements TimeTrackInterface
 
     public function getElapsedTime()
     {
-        return number_format($this->timePassed =($this->endTime-$this->startTime),3);
+        return number_format($this->timePassed =($this->endTime-$this->startTime),6);
     }
 
     public static function currentTime()

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Helper\DBController;
 use App\Helper\FileReader;
 use App\Helper\InputLoader;
 use App\helper\LoggerCreator;
@@ -14,7 +15,8 @@ class HyphenateController
     private $fileReader;
     private $timeTracker;
     private $logger;
-
+    private $syllables;
+    private $dbControll;
     public function __construct()
     {
         $this->hyphenator = new Hyphenator();
@@ -22,6 +24,8 @@ class HyphenateController
         $this->fileReader = new FileReader();
         $this->timeTracker = new TimeTracker();
         $this->logger = LoggerCreator::getInstance();
+        $this->dbControll = new DBController();
+        $this->syllables = $this->fileReader->readFile('patterns.txt');
     }
 
 
@@ -34,6 +38,7 @@ class HyphenateController
             echo "\n  1. Ivesti zodi ir ji suskiemenuoti\n";
             echo "  2. Skiemenuoti sakini\n";
             echo "  3. Baigti darba\n";
+            echo "  4. DB\n";
             $inputLine = $this->inputLoader->getUserInput();
 
             switch ($inputLine) {
@@ -42,8 +47,8 @@ class HyphenateController
                     $inputLine = $inputLine = $this->inputLoader->getUserInput();
                     $this->timeTracker->startTrackingTime();
                     $result = $this->hyphenateOneWord($inputLine);
-                    echo 'Suskiemenuotas zodis: ' . $result . "\n";
                     $this->timeTracker->endTrackingTime();
+                    echo 'Suskiemenuotas zodis: ' . $result . "\n";
                     echo 'Trukme: ' . $this->timeTracker->getElapsedTime() . "\n";
                     break;
                 case 2:
@@ -52,6 +57,8 @@ class HyphenateController
                 case 3:
                     $run = false;
                     break;
+                case 4:
+                    $this->dbControll->connect();
             }
 
         }
@@ -114,7 +121,7 @@ class HyphenateController
     {
         $hyphenedFile = '';
         $fileContent = $this->fileReader->readFile($fileName);
-        $this->logInput(implode($fileContent));
+        $this->logInput($fileContent);
 
         foreach ($fileContent as $sentence) {
             $hyphenedSentence = $this->hyphenateSentence($sentence);
@@ -135,6 +142,7 @@ class HyphenateController
                 $hyphenedSentence[$key] = $this->hyphenateOneWord($element);
             }
         }
+
         return implode($hyphenedSentence) . "\n";
     }
 
@@ -150,9 +158,8 @@ class HyphenateController
 
     public function hyphenateOneWord($word)
     {
-        $syllables = $this->fileReader->readFile('tekstas.txt');
-        $hyphenedWord = $this->hyphenator->hyphenateWord($word, $syllables);
-
+        $hyphenedWord = $this->hyphenator->hyphenateWord($word,$this->syllables );
         return $hyphenedWord;
     }
+
 }

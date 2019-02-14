@@ -9,8 +9,8 @@ class FileReader
         $rows = array();
         $file = new \SplFileObject($fileName);
         $file->setFlags(\SplFileObject::READ_AHEAD | \SplFileObject::SKIP_EMPTY | \SplFileObject::DROP_NEW_LINE);
-        foreach ($file as $line)
-        {
+
+        foreach ($file as $line) {
             $rows[] = $line;
         }
 
