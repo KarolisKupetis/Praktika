@@ -34,7 +34,8 @@ class HyphenateController
     public function beginWork()
     {
         $run = true;
-        $this->source='Nepasirinktas';
+        $this->source = 'Nepasirinktas';
+
         while ($run) {
             echo "\n Naudojamas skiemenavimo modeliu saltinis: $this->source \n";
             echo "  1. Ivesti zodi ir ji suskiemenuoti\n";
@@ -46,7 +47,7 @@ class HyphenateController
 
             switch ($inputLine) {
                 case 1:
-                   $this->uiForOneWordHyphenation();
+                    $this->uiForOneWordHyphenation();
                     break;
                 case 2:
                     $this->uiForSentenceHyphenation();
@@ -83,6 +84,7 @@ class HyphenateController
     private function uiForSentenceHyphenation()
     {
         $run = true;
+
         while ($run) {
             echo "  1. Ivesti sakini ir ji suskiemenuoti\n";
             echo "  2  [pavadinimas.txt] - suskiemenuoti failo turini\n";
@@ -92,7 +94,7 @@ class HyphenateController
 
             switch ($command[0]) {
                 case 1:
-                   $this->hyphenateFromCMD();
+                    $this->hyphenateFromCMD();
                     break;
                 case 2:
                     $filename = $command[1];
@@ -124,7 +126,7 @@ class HyphenateController
         $sentenceAsArray = preg_split('/([^a-zA-Z0-9])/u', $sentence, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
         $hyphenedSentence = $sentenceAsArray;
 
-        foreach ($sentenceAsArray as $key=>$element) {
+        foreach ($sentenceAsArray as $key => $element) {
 
             if ($this->isWord($element) === true) {
                 $hyphenedSentence[$key] = $this->hyphenateOneWord($element);
@@ -146,22 +148,25 @@ class HyphenateController
 
     public function hyphenateOneWord($word)
     {
-        $hyphenedWord = $this->hyphenator->hyphenateWord($word,$this->syllables );
+        $hyphenedWord = $this->hyphenator->hyphenateWord($word, $this->syllables);
+
         return $hyphenedWord;
     }
 
-    private function hyphenateFromCMD(){
+    private function hyphenateFromCMD()
+    {
         echo "\nIrasykite sakini: ";
         $sentence = $this->inputLoader->getUserInput();
         $this->logInput($sentence);
         $hyphenetedSentence = $this->hyphenateSentence($sentence);
         $this->logOutput($hyphenetedSentence);
-        echo 'Isskiemenuotas sakinys: '.$hyphenetedSentence;
-        $elapsedTime= $this->timeTracker->getElapsedTime();
+        echo 'Isskiemenuotas sakinys: ' . $hyphenetedSentence;
+        $elapsedTime = $this->timeTracker->getElapsedTime();
         echo "\n" . 'Trukme : ' . $elapsedTime . "\n";
     }
 
-    private function hyphenateFromFile($filename){
+    private function hyphenateFromFile($filename)
+    {
         $this->timeTracker->startTrackingTime();
         $result = "\n" . $this->hyphenateFile($filename);
         $this->timeTracker->endTrackingTime();
@@ -185,6 +190,7 @@ class HyphenateController
     private function uiForDatabaseWork()
     {
         $run = true;
+
         while ($run) {
             echo "  1 [failopavadinimas.txt] -Ikelti skiemenu modelius \n";
             echo "  2 [failopavadinimas.txt] -Ikelti zodzius\n";
@@ -195,12 +201,12 @@ class HyphenateController
             switch ($command[0]) {
                 case 1:
                     $patternsArray = $this->fileReader->readFile($command[1]);
-                    $this->dbControll->uploadData($patternsArray,1);
+                    $this->dbControll->uploadData($patternsArray, 1);
                     echo "\n Duomenys ikelti \n";
                     break;
                 case 2:
                     $arrayOfWords = $this->fileReader->readFile($command[1]);
-                    $this->dbControll->uploadData($arrayOfWords,2);
+                    $this->dbControll->uploadData($arrayOfWords, 2);
                     echo "\n Duomenys ikelti \n";
                     break;
                 case 3:
@@ -210,10 +216,12 @@ class HyphenateController
         }
     }
 
-    private function uiForSourceSelection(){
+    private function uiForSourceSelection()
+    {
 
         $run = true;
-        while($run){
+
+        while ($run) {
             echo "  1  [failopavadinimas.txt] -Naudoti duomenis is failo \n";
             echo "  2  Naudoti duomenis is duomenu bazes\n";
             echo "  3. Grizti atgal \n";
@@ -223,7 +231,7 @@ class HyphenateController
             switch ($command[0]) {
                 case 1:
                     $filename = $command[1];
-                    $this->sourceSelection(1,$filename);
+                    $this->sourceSelection(1, $filename);
                     break;
                 case 2:
                     $this->sourceSelection(2);
@@ -235,15 +243,16 @@ class HyphenateController
         }
     }
 
-    private function sourceSelection($option,$filename=null)
+    private function sourceSelection($option, $filename = null)
     {
-        if ($option === 1) {
-            $this->syllables=$this->fileReader->readFile($filename);
-            $this->source=$filename;
 
-        }elseif($option === 2){
-            $this->syllables=$this->dbControll->getData();
-            $this->source='Database';
+        if ($option === 1) {
+            $this->syllables = $this->fileReader->readFile($filename);
+            $this->source = $filename;
+
+        } elseif ($option === 2) {
+            $this->syllables = $this->dbControll->getData();
+            $this->source = 'Database';
 
         }
     }

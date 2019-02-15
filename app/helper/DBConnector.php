@@ -63,7 +63,6 @@ class DBConnector
         }
     }
 
-
     public function getData()
     {
         $rows=array();
