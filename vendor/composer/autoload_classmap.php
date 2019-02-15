@@ -8,7 +8,7 @@ $baseDir = dirname($vendorDir);
 return array(
     'App\\Controller\\HyphenateController' => $baseDir . '/app/controller/HyphenateController.php',
     'App\\Controller\\Hyphenator' => $baseDir . '/app/controller/Hyphenator.php',
-    'App\\Helper\\DBController' => $baseDir . '/app/helper/DBController.php',
+    'App\\Helper\\DBConnector' => $baseDir . '/app/helper/DBConnector.php',
     'App\\Helper\\FileReader' => $baseDir . '/app/helper/FileReader.php',
     'App\\Helper\\InputLoader' => $baseDir . '/app/helper/InputLoader.php',
     'App\\Helper\\TimeTrackInterface' => $baseDir . '/app/helper/TimeTrackInterface.php',
