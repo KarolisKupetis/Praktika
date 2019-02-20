@@ -2,22 +2,19 @@
 
 namespace App\Controller;
 
-use App\helper\LoggerCreator;
-use App\Helper\TimeTracker;
+use Monolog\Logger;
 
 class Hyphenator
 {
 
     private $logger;
-    private $timeTracker;
 
-    public function __construct()
+    public function __construct(Logger $logger)
     {
-        $this->logger = LoggerCreator::getInstance();
-        $this->timeTracker = new TimeTracker();
+        $this->logger=$logger;
     }
 
-    private function isSyllableInString($input, $syllable, $offset = null)
+    private function findSyllablePositionInWord($input, $syllable, $offset = null)
     {
         $onlyLettersSyllable = preg_replace('/\d/', '', $syllable);
         $foundPosition = strpos(strtolower($input), $onlyLettersSyllable, $offset);
@@ -32,30 +29,22 @@ class Hyphenator
 
     public function hyphenateWord($input, $patternsArray)
     {
-        $this->timeTracker->startTrackingTime();
-        $this->logger->addToMessage('Given Word : { ' . $input . ' }');
-        $dotInputdot = '.' . $input . '.';
-        $inputAsArray = str_split(implode(' ', str_split($dotInputdot)));
-        $this->logger->addToMessage(' Patterns:{');
+        $inputWithDots = '.' . $input . '.';
+        $inputAsArray = str_split(implode(' ', str_split($inputWithDots)));
 
         foreach ($patternsArray as $syllable) {
 
-            $syllablePlace = $this->isSyllableInString($dotInputdot, $syllable);
+            $syllablePosition = $this->findSyllablePositionInWord($inputWithDots, $syllable);
 
-            while ($syllablePlace !== false) {
-                $this->logger->addToMessage($syllable . ' ');
-                $spaceIndexInWord = $syllablePlace * 2 + 1;
+            while ($syllablePosition !== false) {
+
+                $spaceIndexInWord = $syllablePosition * 2 + 1;
                 $inputAsArray = $this->updateArrayNumbers($spaceIndexInWord, $inputAsArray, $syllable);
-                $syllablePlace = $this->isSyllableInString($dotInputdot, $syllable, $syllablePlace + 1);
+                $syllablePosition = $this->findSyllablePositionInWord($inputWithDots, $syllable, $syllablePosition + 1);
             }
-
         }
-        $this->logger->addToMessage('}');
+
         $hyphenedWord = $this->arrayToHyphenatedWord($inputAsArray);
-        $this->timeTracker->endTrackingTime();
-        $elapsedTime = $this->timeTracker->getElapsedTime();
-        $this->logger->addToMessage('Hyphened word :{ ' . $hyphenedWord . ' }' . ' Elapsed time: ' . $elapsedTime);
-        $this->logger->logToFile();
 
         return $hyphenedWord;
     }
