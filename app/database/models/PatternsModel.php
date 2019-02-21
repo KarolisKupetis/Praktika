@@ -7,6 +7,7 @@ use PDO;
 
 class PatternsModel extends AbstractModel
 {
+
     public function __construct()
     {
         $this->connection=$this->connect();
@@ -45,5 +46,10 @@ class PatternsModel extends AbstractModel
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
         return $result;
+    }
+
+    public function getPatternByPatternID($patternId)
+    {
+        return $this->selectByID('patterns',$patternId );
     }
 }

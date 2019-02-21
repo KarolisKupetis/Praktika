@@ -19,23 +19,30 @@ class PatternsWordsModel extends AbstractModel
         $sql = 'SELECT * FROM patterns_words WHERE word_id= ? ';
         $stmt = $this->connection->prepare($sql);
         $stmt->execute([$wordId]);
+
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)){
             $patterns[] = $row;
         }
-
         return $patterns;
     }
 
-    public function insertPatterns_Words($patternId,$wordId)
+    public function insertPatternsWords($patternId,$wordId)
     {
         $sql = 'INSERT IGNORE INTO patterns_words(pattern_id,word_id) VALUES (?,?)';
         $stmt = $this->connection->prepare($sql);
         $stmt->execute([$patternId,$wordId]);
     }
 
-
-    public function truncateHyphened_wordsTable()
+    public function truncatePatternsWordsTable()
     {
-        $this->truncateTable('hyphened_words');
+        $this->truncateTable('patterns_words');
+    }
+
+    public function deleteRelationWhereWordID($wordID)
+    {
+        $this->connection = $this->connect();
+        $sql = 'DELETE FROM patterns_words WHERE word_id = ?';
+        $stmt = $this->connection->prepare($sql);
+        $stmt->execute([$wordID]);
     }
 }

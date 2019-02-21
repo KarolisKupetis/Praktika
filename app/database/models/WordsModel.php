@@ -55,4 +55,8 @@ class WordsModel extends AbstractModel
         $this->truncateTable('words');
     }
 
+    public function deleteWordWhereID($wordID)
+    {
+        $this->deleteWhereID('words',$wordID);
+    }
 }

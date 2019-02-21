@@ -3,7 +3,6 @@
 namespace App\database;
 
 use App\database\models\HyphenedWordsModel;
-use App\database\models\Patterns_WordsModel;
 use App\database\models\PatternsModel;
 use App\database\models\PatternsWordsModel;
 
@@ -36,12 +35,16 @@ class Controller
 
     public function uploadPatterns($patterns)
     {
+        $this->hyphenedWordsModel->truncateHyphened_wordsTable();
+        $this->patternsWordsModel->truncatePatternsWordsTable();
         $this->patternsModel->truncatePatternsTable();
         $this->patternsModel->insertPatterns($patterns);
     }
 
     public function uploadWords($words)
     {
+        $this->hyphenedWordsModel->truncateHyphened_wordsTable();
+        $this->patternsWordsModel->truncatePatternsWordsTable();
         $this->wordsModel->truncateWordsTable();
         $this->wordsModel->insertWords($words);
     }
@@ -63,14 +66,28 @@ class Controller
         return $this->wordsModel->getWordByWord($word);
     }
 
-    public function saveWordHyphenation(array $patterns, $wordsTableRow,$hyphenedWord)
+    public function findWordsIDByWord($word)
     {
-        $wordsTableRow = $this->findWord($wordsTableRow);
-        $this->hyphenedWordsModel->insertHyphenedWord($hyphenedWord,$wordsTableRow['ID']);
+        $wordTableRow=$this->wordsModel->getWordByWord($word);
+        return $wordTableRow['ID'];
+    }
+
+    public function saveWordHyphenation(array $patterns, $inputWord,$hyphenedWord)
+    {
+        $wordsID = $this->findWordsIDByWord($inputWord);
+
+        if(!$wordsID)
+        {
+            $this->wordsModel->insertOneWord($inputWord);
+            $wordsID = $this->findWordsIDByWord($inputWord);
+        }
+
+        $this->hyphenedWordsModel->insertHyphenedWord($hyphenedWord,$wordsID);
+
         foreach ($patterns as $pattern)
         {
-            $tableRow =$this->patternsModel->getPatternByPattern($pattern);
-            $this->patternsWordsModel->insertPatterns_Words($tableRow['ID'],$wordsTableRow['ID']);
+            $PatternTableRow =$this->patternsModel->getPatternByPattern($pattern);
+            $this->patternsWordsModel->insertPatternsWords($PatternTableRow['ID'],$wordsID);
         }
     }
 
@@ -80,5 +97,44 @@ class Controller
         $result = $tableRow['hyphened_word'];
 
         return $result;
+    }
+
+    public function findUsedPatternsWithWord($wordID)
+    {
+        $patterns = array();
+        $patternsRows = $this->patternsWordsModel->findPatternsIDByWordID($wordID);
+
+        foreach ($patternsRows as $pattern){
+            $tableRow =$this->patternsModel->getPatternByPatternID($pattern['pattern_id']);
+            $patterns[] = $tableRow['pattern'];
+        }
+
+        return $patterns;
+    }
+
+    public function getHyphenedWords()
+    {
+        $hyphenedWords=array();
+        $table =$this->hyphenedWordsModel->getAllHyphenedWords();
+
+        foreach ($table as $item) {
+            $hyphenedWords[] = $item['hyphened_word'];
+        }
+
+        return $hyphenedWords;
+    }
+
+    public function deleteWordWhereID($wordId)
+    {
+        $this->wordsModel->deleteWordWhereID($wordId);
+        $tableRow = $this->hyphenedWordsModel->getHyphenedWordByWordID($wordId);
+        $hyphenedWordID = $tableRow['ID'];
+        $this->hyphenedWordsModel->deleteHyphenedWordWhereID($hyphenedWordID);
+        $this->patternsWordsModel->deleteRelationWhereWordID($wordId);
+    }
+
+    public function insertOneWord($word)
+    {
+        $this->wordsModel->insertOneWord($word);
     }
 }

@@ -6,12 +6,11 @@ use Monolog\Logger;
 
 class Hyphenator
 {
-
     private $logger;
-
-    public function __construct(Logger $logger)
+    private $usedPatterns;
+    public function __construct( )
     {
-        $this->logger=$logger;
+
     }
 
     private function findSyllablePositionInWord($input, $syllable, $offset = null)
@@ -31,13 +30,14 @@ class Hyphenator
     {
         $inputWithDots = '.' . $input . '.';
         $inputAsArray = str_split(implode(' ', str_split($inputWithDots)));
+        $this->usedPatterns= array();
 
         foreach ($patternsArray as $syllable) {
 
             $syllablePosition = $this->findSyllablePositionInWord($inputWithDots, $syllable);
 
             while ($syllablePosition !== false) {
-
+                $this->usedPatterns[]=$syllable;
                 $spaceIndexInWord = $syllablePosition * 2 + 1;
                 $inputAsArray = $this->updateArrayNumbers($spaceIndexInWord, $inputAsArray, $syllable);
                 $syllablePosition = $this->findSyllablePositionInWord($inputWithDots, $syllable, $syllablePosition + 1);
@@ -97,5 +97,10 @@ class Hyphenator
         unset($arrayElement);
 
         return implode('', $array);
+    }
+
+    public function getUsedPatterns()
+    {
+        return $this->usedPatterns;
     }
 }

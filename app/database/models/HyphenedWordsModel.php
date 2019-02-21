@@ -37,4 +37,14 @@ class HyphenedWordsModel extends AbstractModel
     {
         $this->truncateTable('hyphened_words');
     }
+
+    public function getAllHyphenedWords()
+    {
+        return $this->selectAll('hyphened_words');
+    }
+
+    public function deleteHyphenedWordWhereID($hyphenedWordId)
+    {
+        $this->deleteWhereID('hyphened_words',$hyphenedWordId);
+    }
 }
