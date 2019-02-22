@@ -134,11 +134,6 @@ class DatabaseState implements StateInterface
 
     private function hyphenateOneWordFromSentence($word)
     {
-        if ($this->isWordAlreadyHyphenated($word)) {
-
-            return $this->getAlreadyHyphenedWord($word);
-        }
-
         return $this->hyphenator->hyphenateWord($word, $this->patterns);
     }
 }

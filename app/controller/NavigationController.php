@@ -11,11 +11,11 @@ use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 
 
-class Navigator
+class NavigationController
 {
     private $inputLoader;
     private $fileReader;
-    private $dbControll;
+    private $dbController;
     private $sourceName;
     private $HPController;
     private $logger;
@@ -26,7 +26,7 @@ class Navigator
         $this->logger=$logger;
         $this->inputLoader = new InputLoader();
         $this->fileReader = new FileReader();
-        $this->dbControll = new DatabaseController();
+        $this->dbController = new DatabaseController();
         $this->HPController = new HyphenationController($logger);
     }
 
@@ -83,10 +83,11 @@ class Navigator
 
             switch ($command[0]) {
                 case 1:
+                    echo 'Type in sentence :';
                     $sentence = $this->inputLoader->getUserInput();
                     $this->logger->info('Given sentence'.$sentence);
-                    $resultSenttence =$this->HPController->hyphenateSentence($sentence);
-                    echo $resultSenttence;
+                    $resultSentence =$this->HPController->hyphenateSentence($sentence);
+                    echo $resultSentence;
                     break;
                 case 2:
                     $filename = $command[1];
@@ -113,12 +114,12 @@ class Navigator
             switch ($command[0]) {
                 case 1:
                     $patternsArray = $this->fileReader->readFile($command[1]);
-                    $this->dbControll->uploadPatterns($patternsArray);
+                    $this->dbController->uploadPatterns($patternsArray);
                     echo "\n Data uploaded successfully \n";
                     break;
                 case 2:
                     $arrayOfWords = $this->fileReader->readFile($command[1]);
-                    $this->dbControll->uploadWords($arrayOfWords);
+                    $this->dbController->uploadWords($arrayOfWords);
                     echo "\n Data uploaded successfully \n";
                     break;
                 case 3:

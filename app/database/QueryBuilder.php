@@ -38,7 +38,9 @@ class QueryBuilder
 
     public function on($tableField, $statement, $joinTableField)
     {
-        $condition = $this->tableName . '.' . $tableField . ' ' . $statement . ' ' . $this->joinTableName . '.' . $joinTableField;
+        $condition = $this->tableName . '.' . $tableField . ' ' . $statement . ' 
+        ' . $this->joinTableName . '.' . $joinTableField;
+
         $this->ON[] = $condition;
         $this->addOn();
 

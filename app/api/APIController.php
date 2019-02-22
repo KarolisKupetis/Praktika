@@ -24,6 +24,9 @@ class APIController
         {
             $this->create();
         }
+        else{
+            http_response_code(400);
+        }
     }
 
     private function getList()
@@ -31,24 +34,27 @@ class APIController
         $dbControl = new DatabaseController();
         $list = $dbControl->getHyphenedWords();
         print_r($list);
+
         http_response_code(200);
     }
 
     private function delete()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST'&&isset($_POST['ID'])){
-            $dbcontrol = new DatabaseController();
-            $dbcontrol->deleteWordWhereID($_POST["ID"]);
+            $dbController = new DatabaseController();
+            $dbController->deleteWordWhereID($_POST["ID"]);
+
             http_response_code(200);
         }
+
         http_response_code(404);
     }
 
     private function create()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST'&&isset($_POST['word'])){
-            $dbControler = new DatabaseController();
-            $dbControler->insertOneWord($_POST['word']);
+            $dbController = new DatabaseController();
+            $dbController->insertOneWord($_POST['word']);
             http_response_code(201);
         }
         http_response_code(404);
