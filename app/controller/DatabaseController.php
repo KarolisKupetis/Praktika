@@ -6,7 +6,7 @@ use App\database\models\HyphenedWordsModel;
 use App\database\models\PatternsModel;
 use App\database\models\PatternsWordsModel;
 
-class Controller
+class DatabaseController
 {
     private $hyphenedWordsModel;
     private $patternsWordsModel;
@@ -99,9 +99,11 @@ class Controller
         return $result;
     }
 
-    public function findUsedPatternsWithWord($wordID)
+    public function findUsedPatternsWithWord($word)
     {
         $patterns = array();
+        $tableRow = $this->wordsModel->getWordByWord($word);
+        $wordID = $tableRow['ID'];
         $patternsRows = $this->patternsWordsModel->findPatternsIDByWordID($wordID);
 
         foreach ($patternsRows as $pattern){

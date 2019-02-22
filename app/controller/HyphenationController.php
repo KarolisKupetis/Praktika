@@ -5,53 +5,20 @@ namespace App\Controller;
 use App\Helper\FileReader;
 use App\Helper\InputLoader;
 use App\Helper\TimeTracker;
+use App\SourceStateMachine\DatabaseState;
 use App\SourceStateMachine\NoState;
 use Psr\Log\LoggerInterface;
 
 class HyphenationController
 {
     private $timeTracker;
-    private $inputLoader;
-    private $fileReader;
     private $state;
-    private $hyphenator;
-    private $patterns;
-
-    public function __construct()
+    private $logger;
+    public function __construct(LoggerInterface $logger)
     {
+        $this->logger=$logger;
         $this->timeTracker= new TimeTracker();
-        $this->inputLoader= new InputLoader();
-        $this->fileReader= new FileReader();
-        $this->hyphenator = new Hyphenator();
-        $this->state= new NoState();
-    }
-
-    public function hyphenateSentence($sentence)
-    {
-        $sentenceAsArray = preg_split('/([^a-zA-Z])/u', $sentence, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
-        $hyphenedSentence = $sentenceAsArray;
-
-        foreach ($sentenceAsArray as $key => $element) {
-
-            if ($this->isWord($element) === true) {
-                $hyphenedSentence[$key] = $this->hyphenateOneWordFromSentence($element);
-            }
-        }
-
-        return implode($hyphenedSentence) . "\n";
-    }
-
-    public function hyphenateFile($fileName)
-    {
-        $fileContent = $this->fileReader->readFile($fileName);
-        $result = '';
-
-        foreach ($fileContent as $sentence) {
-            $hyphenedSentence = $this->hyphenateSentence($sentence);
-            $result .= $hyphenedSentence;
-        }
-
-        echo $result;
+        $this->state= new DatabaseState($logger);
     }
 
     public function hyphenateWord($inputword)
@@ -59,30 +26,19 @@ class HyphenationController
         return $this->state->hyphenateWord($inputword);
     }
 
-    private function isWord($subject)
+    public function hyphenateSentence($sentence)
     {
-        if (preg_match('/[^a-zA-Z]/', $subject)) {
-
-            return false;
-        }
-
-        return true;
+        return $this->state->hyphenateSentence($sentence);
     }
 
-    private function hyphenateOneWordFromSentence($word)
+    public function hyphenateFile($filename)
     {
-        return $this->hyphenator->hyphenateWord($word, $this->patterns);
+        return $this->state->hyphenateFile($filename);
     }
 
     public function setState($sourceState)
     {
-        if ($sourceState === $this->state) {
-            echo "Already selected";
-
-        } else {
             $this->state = $sourceState;
-            $this->patterns=$this->state->getPatterns();
-        }
     }
 
 

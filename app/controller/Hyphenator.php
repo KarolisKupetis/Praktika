@@ -6,8 +6,8 @@ use Monolog\Logger;
 
 class Hyphenator
 {
-    private $logger;
     private $usedPatterns;
+
     public function __construct( )
     {
 

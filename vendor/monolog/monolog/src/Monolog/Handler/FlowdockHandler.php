@@ -16,12 +16,12 @@ use Monolog\Formatter\FlowdockFormatter;
 use Monolog\Formatter\FormatterInterface;
 
 /**
- * Sends notifications through the Flowdock push API
+ * Sends notifications through the Flowdock push api
  *
  * This must be configured with a FlowdockFormatter instance via setFormatter()
  *
  * Notes:
- * API token - Flowdock API token
+ * api token - Flowdock api token
  *
  * @author Dominik Liebler <liebler.dominik@gmail.com>
  * @see https://www.flowdock.com/api/push
@@ -98,7 +98,7 @@ class FlowdockHandler extends SocketHandler
     }
 
     /**
-     * Builds the body of API call
+     * Builds the body of api call
      *
      * @param  array  $record
      * @return string
@@ -109,7 +109,7 @@ class FlowdockHandler extends SocketHandler
     }
 
     /**
-     * Builds the header of the API Call
+     * Builds the header of the api Call
      *
      * @param  string $content
      * @return string

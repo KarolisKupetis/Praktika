@@ -2,7 +2,7 @@
 
 namespace App\API;
 
-use App\database\Controller;
+use App\database\DatabaseController;
 
 class APIController
 {
@@ -18,7 +18,7 @@ class APIController
 
         }elseif(isset($_GET['update'])){
 
-            echo "Niekas nesiupdateina krc";
+           echo "Cant update"; //Nothing to update???
 
         }elseif(isset($_GET['create']))
         {
@@ -28,7 +28,7 @@ class APIController
 
     private function getList()
     {
-        $dbControl = new Controller();
+        $dbControl = new DatabaseController();
         $list = $dbControl->getHyphenedWords();
         print_r($list);
         http_response_code(200);
@@ -37,7 +37,7 @@ class APIController
     private function delete()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST'&&isset($_POST['ID'])){
-            $dbcontrol = new Controller();
+            $dbcontrol = new DatabaseController();
             $dbcontrol->deleteWordWhereID($_POST["ID"]);
             http_response_code(200);
         }
@@ -47,9 +47,9 @@ class APIController
     private function create()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST'&&isset($_POST['word'])){
-            $dbControler = new Controller();
+            $dbControler = new DatabaseController();
             $dbControler->insertOneWord($_POST['word']);
-            http_response_code(200);
+            http_response_code(201);
         }
         http_response_code(404);
     }

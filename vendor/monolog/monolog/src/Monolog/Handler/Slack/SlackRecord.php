@@ -16,7 +16,7 @@ use Monolog\Formatter\NormalizerFormatter;
 use Monolog\Formatter\FormatterInterface;
 
 /**
- * Slack record utility helping to log to Slack webhooks or API.
+ * Slack record utility helping to log to Slack webhooks or api.
  *
  * @author Greg Kedzierski <greg@gregkedzierski.com>
  * @author Haralan Dobrev <hkdobrev@gmail.com>

@@ -93,7 +93,7 @@ class FleepHookHandler extends SocketHandler
     }
 
     /**
-     * Builds the header of the API Call
+     * Builds the header of the api Call
      *
      * @param  string $content
      * @return string
@@ -110,7 +110,7 @@ class FleepHookHandler extends SocketHandler
     }
 
     /**
-     * Builds the body of API call
+     * Builds the body of api call
      *
      * @param  array  $record
      * @return string

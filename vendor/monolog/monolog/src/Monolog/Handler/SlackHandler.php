@@ -16,7 +16,7 @@ use Monolog\Logger;
 use Monolog\Handler\Slack\SlackRecord;
 
 /**
- * Sends notifications through Slack API
+ * Sends notifications through Slack api
  *
  * @author Greg Kedzierski <greg@gregkedzierski.com>
  * @see    https://api.slack.com/
@@ -24,19 +24,19 @@ use Monolog\Handler\Slack\SlackRecord;
 class SlackHandler extends SocketHandler
 {
     /**
-     * Slack API token
+     * Slack api token
      * @var string
      */
     private $token;
 
     /**
-     * Instance of the SlackRecord util class preparing data for Slack API.
+     * Instance of the SlackRecord util class preparing data for Slack api.
      * @var SlackRecord
      */
     private $slackRecord;
 
     /**
-     * @param  string                    $token                  Slack API token
+     * @param  string                    $token                  Slack api token
      * @param  string                    $channel                Slack channel (encoded ID or name)
      * @param  string|null               $username               Name of a bot
      * @param  bool                      $useAttachment          Whether the message should be added to Slack as attachment (plain text otherwise)
@@ -94,7 +94,7 @@ class SlackHandler extends SocketHandler
     }
 
     /**
-     * Builds the body of API call
+     * Builds the body of api call
      *
      * @param  array  $record
      * @return string
@@ -125,7 +125,7 @@ class SlackHandler extends SocketHandler
     }
 
     /**
-     * Builds the header of the API Call
+     * Builds the header of the api Call
      *
      * @param  string $content
      * @return string

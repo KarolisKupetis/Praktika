@@ -17,11 +17,11 @@ use Monolog\Logger;
  * Sends notifications through the hipchat api to a hipchat room
  *
  * Notes:
- * API token - HipChat API token
+ * api token - HipChat api token
  * Room      - HipChat Room Id or name, where messages are sent
  * Name      - Name used to send the message (from)
  * notify    - Should the message trigger a notification in the clients
- * version   - The API version to use (HipChatHandler::API_V1 | HipChatHandler::API_V2)
+ * version   - The api version to use (HipChatHandler::API_V1 | HipChatHandler::API_V2)
  *
  * @author Rafael Dohms <rafael@doh.ms>
  * @see    https://www.hipchat.com/docs/api
@@ -29,12 +29,12 @@ use Monolog\Logger;
 class HipChatHandler extends SocketHandler
 {
     /**
-     * Use API version 1
+     * Use api version 1
      */
     const API_V1 = 'v1';
 
     /**
-     * Use API version v2
+     * Use api version v2
      */
     const API_V2 = 'v2';
 
@@ -84,7 +84,7 @@ class HipChatHandler extends SocketHandler
     private $version;
 
     /**
-     * @param string $token   HipChat API Token
+     * @param string $token   HipChat api Token
      * @param string $room    The room that should be alerted of the message (Id or Name)
      * @param string $name    Name used in the "from" field.
      * @param bool   $notify  Trigger a notification in clients or not
@@ -93,12 +93,12 @@ class HipChatHandler extends SocketHandler
      * @param bool   $useSSL  Whether to connect via SSL.
      * @param string $format  The format of the messages (default to text, can be set to html if you have html in the messages)
      * @param string $host    The HipChat server hostname.
-     * @param string $version The HipChat API version (default HipChatHandler::API_V1)
+     * @param string $version The HipChat api version (default HipChatHandler::API_V1)
      */
     public function __construct($token, $room, $name = 'Monolog', $notify = false, $level = Logger::CRITICAL, $bubble = true, $useSSL = true, $format = 'text', $host = 'api.hipchat.com', $version = self::API_V1)
     {
         if ($version == self::API_V1 && !$this->validateStringLength($name, static::MAXIMUM_NAME_LENGTH)) {
-            throw new \InvalidArgumentException('The supplied name is too long. HipChat\'s v1 API supports names up to 15 UTF-8 characters.');
+            throw new \InvalidArgumentException('The supplied name is too long. HipChat\'s v1 api supports names up to 15 UTF-8 characters.');
         }
 
         $connectionString = $useSSL ? 'ssl://'.$host.':443' : $host.':80';
@@ -127,7 +127,7 @@ class HipChatHandler extends SocketHandler
     }
 
     /**
-     * Builds the body of API call
+     * Builds the body of api call
      *
      * @param  array  $record
      * @return string
@@ -151,7 +151,7 @@ class HipChatHandler extends SocketHandler
             }
         }
 
-        // if we are using the legacy API then we need to send some additional information
+        // if we are using the legacy api then we need to send some additional information
         if ($this->version == self::API_V1) {
             $dataArray['room_id'] = $this->room;
         }
@@ -166,7 +166,7 @@ class HipChatHandler extends SocketHandler
     }
 
     /**
-     * Builds the header of the API Call
+     * Builds the header of the api Call
      *
      * @param  string $content
      * @return string
