@@ -8,11 +8,6 @@ class Hyphenator
 {
     private $usedPatterns;
 
-    public function __construct( )
-    {
-
-    }
-
     private function findSyllablePositionInWord($input, $syllable, $offset = null)
     {
         $onlyLettersSyllable = preg_replace('/\d/', '', $syllable);

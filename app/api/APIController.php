@@ -3,60 +3,71 @@
 namespace App\API;
 
 use App\database\DatabaseController;
+use Psr\Log\LoggerInterface;
 
 class APIController
 {
     public function requestFunction()
     {
-        if(isset($_GET['getwords']))
-        {
-            $this->getList();
-        }
-        elseif(isset($_GET['delete'])) {
+        $calledMethod = $_SERVER['REQUEST_METHOD'];
 
-            $this->delete();
+        switch ($calledMethod) {
 
-        }elseif(isset($_GET['update'])){
+            case 'POST':
+                $this->create();
+                break;
 
-           echo "Cant update"; //Nothing to update???
+            case 'GET':
+                $list = $this->getData();
+                print_r($list);
+                http_response_code(200);
+                break;
 
-        }elseif(isset($_GET['create']))
-        {
-            $this->create();
-        }
-        else{
-            http_response_code(400);
+            case 'PUT':
+                $this->updateData();
+                break;
+
+            case 'DELETE':
+                $this->deleteData();
+                break;
+
         }
     }
 
-    private function getList()
+    private function getData()
     {
         $dbControl = new DatabaseController();
-        $list = $dbControl->getHyphenedWords();
-        print_r($list);
+        return $dbControl->getHyphenedWords();
 
-        http_response_code(200);
     }
 
-    private function delete()
+    private function deleteData()
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST'&&isset($_POST['ID'])){
-            $dbController = new DatabaseController();
-            $dbController->deleteWordWhereID($_POST["ID"]);
+        parse_str(file_get_contents('php://input'), $_DELETE);
+        echo $_DELETE['ID'];
+        $dbController = new DatabaseController();
+        //$dbController->deleteWordWhereID($_DELETE['ID']);
 
-            http_response_code(200);
-        }
-
+        //Papildyti po modelio sukurimo
         http_response_code(404);
     }
 
     private function create()
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST'&&isset($_POST['word'])){
+        if (isset($_POST['word'])) {
             $dbController = new DatabaseController();
             $dbController->insertOneWord($_POST['word']);
             http_response_code(201);
         }
+
         http_response_code(404);
+    }
+
+    private function updateData()
+    {
+        parse_str(file_get_contents('php://input'), $_PUT);
+        echo $_PUT['word'];
+
+        //Papildyti po modelio sukurimo.
     }
 }

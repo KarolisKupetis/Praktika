@@ -21,9 +21,9 @@ class HyphenationController
         $this->state= new DatabaseState($logger);
     }
 
-    public function hyphenateWord($inputword)
+    public function hyphenateWord($inputWord)
     {
-        return $this->state->hyphenateWord($inputword);
+        return $this->state->hyphenateWord($inputWord);
     }
 
     public function hyphenateSentence($sentence)

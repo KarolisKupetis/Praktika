@@ -3,6 +3,7 @@
 namespace App\database\models;
 
 use App\database\AbstractModel;
+use App\database\QueryBuilder;
 use PDO;
 
 class PatternsModel extends AbstractModel
@@ -10,14 +11,18 @@ class PatternsModel extends AbstractModel
 
     public function __construct()
     {
-        $this->connection=$this->connect();
+        $this->connection = $this->connect();
+        $this->tableName = 'patterns';
     }
 
     public function insertPatterns(array $patternsArray)
     {
-        $this->connection=$this->connect();
-        $sql = 'INSERT IGNORE INTO patterns(pattern) VALUES(?)';
-        $insertStatement=$this->connection->prepare($sql);
+        $sql = new QueryBuilder();
+        $sql->
+        insertIgnore($this->tableName, 'pattern')->
+        values('?');
+
+        $insertStatement = $this->connection->prepare($sql);
         $this->connection->beginTransaction();
 
         foreach ($patternsArray as $pattern) {
@@ -29,27 +34,22 @@ class PatternsModel extends AbstractModel
 
     public function getPatterns()
     {
-       return $this->selectAll('patterns');
+        return $this->selectAll($this->tableName);
     }
 
     public function truncatePatternsTable()
     {
-        $this->truncateTable('patterns');
+        $this->truncateTable($this->tableName);
     }
 
-    public function getPatternByPattern($pattern)
+    public function getPatternBy($pattern = null, $patternId = null)
     {
-        $this->connection=$this->connect();
-        $sql = 'SELECT * FROM patterns WHERE pattern= ? ';
-        $stmt = $this->connection->prepare($sql);
-        $stmt->execute([$pattern]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($pattern) {
+            return $this->selectBy($this->tableName, 'pattern', $pattern);
+        } elseif ($patternId) {
+            return $this->selectBy($this->tableName, 'ID', $patternId);
+        }
 
-        return $result;
-    }
-
-    public function getPatternByPatternID($patternId)
-    {
-        return $this->selectByID('patterns',$patternId );
+        return null;
     }
 }

@@ -8,24 +8,35 @@ class WordsModel extends AbstractModel
 {
     public function __construct()
     {
-        $this->connection=$this->connect();
+        $this->connection = $this->connect();
+        $this->tableName = 'words';
     }
 
-    public function insertOneWord($word) {
-            $stmt = $this->connection->prepare('INSERT IGNORE INTO words(word) VALUES (:word)');
-            $params = array('word'  =>$word);
-            $stmt->execute($params);
+    public function insertOneWord($word)
+    {
+        $sql = new QueryBuilder();
+        $sql->
+        insertIgnore($this->tableName, 'word')->
+        values('?');
+
+        $stmt = $this->connection->prepare($sql);
+        $stmt->execute($word);
     }
 
     public function insertWords(array $wordsArray)
     {
-        $sql = 'INSERT IGNORE INTO words(word) VALUES(?)';
-        $insertStatement=$this->connection->prepare($sql);
+        $sql = new QueryBuilder();
+        $sql->
+        insertIgnore($this->tableName, 'word')->
+        values('?');
+
+        $insertStatement = $this->connection->prepare($sql);
         $this->connection->beginTransaction();
 
         foreach ($wordsArray as $row) {
             $insertStatement->execute([$row]);
         }
+
         $this->connection->commit();
     }
 
@@ -36,18 +47,12 @@ class WordsModel extends AbstractModel
 
     public function getWordByID($id)
     {
-       return $this->selectByID('words',$id);
+        return $this->selectBy($this->tableName, 'word_id', $id);
     }
 
     public function getWordByWord($word)
     {
-        $this->connection=$this->connect();
-        $sql = 'SELECT * FROM words WHERE word= ? ';
-        $stmt = $this->connection->prepare($sql);
-        $stmt->execute([$word]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        return $result;
+        return $this->selectBy($this->tableName, 'word', $word);
     }
 
     public function truncateWordsTable()
@@ -57,6 +62,6 @@ class WordsModel extends AbstractModel
 
     public function deleteWordWhereID($wordID)
     {
-        $this->deleteWhereID('words',$wordID);
+        $this->deleteWhere($this->tableName, 'word_id', $wordID);
     }
 }

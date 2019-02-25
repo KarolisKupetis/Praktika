@@ -1,161 +1,133 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: vismauser2
- * Date: 19.2.22
- * Time: 08.43
- */
 
 namespace App\database;
 
-
 class QueryBuilder
 {
-    private $select = [];
-    private $tableName;
-    private $joinTableName;
-    private $where = [];
-    private $ANDWhere = [];
-    private $ORWhere = [];
-    private $ON = [];
-    private $query = [];
+    private $query;
 
     public function from($table)
     {
-        $this->tableName = $table;
-        $this->addFrom();
+        $this->query .= ' FROM ' . $table;
 
         return $this;
     }
 
-    public function select(...$fields)
+    public function select($fields = null)
     {
-        $this->select = $fields;
-        $this->addSelect();
+        if ($fields === null || $fields === '') {
+            $fields = '*';
+        }
+
+        $this->query .= 'SELECT ' . $fields;
+
+        return $this;
+    }
+
+    public function truncate($tableName)
+    {
+        $this->query .= 'TRUNCATE TABLE ' . $tableName;
+
+        return $this;
+    }
+
+    public function insert($tableName, $fields)
+    {
+        $this->query .= 'INSERT INTO';
+        $this->query .= ' ' . $tableName;
+        $this->query .= ' (' . $fields . ')';
+
+        return $this;
+    }
+
+    public function insertIgnore($tableName, $fields)
+    {
+        $this->query .= 'INSERT IGNORE INTO';
+        $this->query .= ' ' . $tableName;
+        $this->query .= ' (' . $fields . ')';
+
+        return $this;
+    }
+
+    public function values($values)
+    {
+        $this->query .= ' VALUES ';
+        $this->query .= '(' . $values . ')';
+
+        return $this;
+    }
+
+    public function delete()
+    {
+        $this->query .= 'DELETE';
 
         return $this;
     }
 
     public function on($tableField, $statement, $joinTableField)
     {
-        $condition = $this->tableName . '.' . $tableField . ' ' . $statement . ' 
-        ' . $this->joinTableName . '.' . $joinTableField;
-
-        $this->ON[] = $condition;
-        $this->addOn();
+        $this->query .= ' ON';
+        $this->query .= ' ' . $tableField;
+        $this->query .= ' ' . $statement;
+        $this->query .= ' ' . $joinTableField;
 
         return $this;
     }
 
     public function ignore()
     {
-        $this->query[] = 'IGNORE';
+        $this->query .= ' IGNORE ';
+
         return $this;
     }
 
     public function distinct()
     {
-        $this->query[] = 'DISTINCT';
+        $this->query .= ' DISTINCT ';
+
         return $this;
     }
 
-    public function where($field, $statement, $compareTo)
+    public function where($field1, $condition, $field2)
     {
-        $condition = $field . ' ' . $statement . ' :' . $compareTo;
-        $this->where[] = $condition;
-        $this->addWhere();
+        $this->query .= ' ' . $field1;
+        $this->query .= ' ' . $condition;
+        $this->query .= ' ' . $field2;
 
         return $this;
     }
 
     public function innerJoin($joinTableName)
     {
-        $this->joinTableName = $joinTableName;
-        $this->addInnerJoin();
+
+        $this->query .= ' JOIN ' . $joinTableName;
 
         return $this;
     }
 
     public function orWhere($field, $statement, $compareTo)
     {
-        $condition = $field . ' ' . $statement . ' :' . $compareTo;
-        $this->ORWhere[] = $condition;
-        $this->addORWhere();
+        $this->query .= ' OR';
+        $this->query .= ' ' . $field;
+        $this->query .= ' ' . $statement;
+        $this->query .= ' ' . $compareTo;
 
         return $this;
     }
 
     public function andWhere($field, $statement, $compareTo)
     {
-        $condition = $field . ' ' . $statement . ' :' . $compareTo;
-        $this->ANDWhere[] = $condition;
-        $this->addAndWhere();
+        $this->query .= ' AND';
+        $this->query .= ' ' . $field;
+        $this->query .= ' ' . $statement;
+        $this->query .= ' ' . $compareTo;
 
         return $this;
     }
 
-    private function addSelect()
+    public function __toString()
     {
-        $this->query[] = 'SELECT';
-
-        if ($this->select) {
-            $this->query[] = implode(', ', $this->select);
-        } else {
-            $this->query[] = '*';
-        }
+        return $this->query;
     }
-
-    private function addFrom()
-    {
-        $this->query[] = 'FROM';
-        $this->query[] = $this->tableName;
-    }
-
-    private function addWhere()
-    {
-
-        $this->query[] = 'WHERE';
-        $this->query[] = '' . implode(' ', $this->where) . '';
-
-        $this->where = null;
-    }
-
-    private function addAndWhere()
-    {
-        if ($this->ANDWhere) {
-            $this->query[] = 'AND ' . implode(' ', $this->ANDWhere) . '';
-        }
-
-        $this->ANDWhere = null;
-    }
-
-    private function addORWhere()
-    {
-        if ($this->ORWhere) {
-            $this->query[] = 'OR ' . implode(' ', $this->ORWhere) . '';
-        }
-
-        $this->ORWhere = null;
-    }
-
-    private function addInnerJoin()
-    {
-        $this->query[] = 'INNER JOIN';
-        $this->query[] = $this->joinTableName;
-    }
-
-    private function addOn()
-    {
-        $this->query[] = 'ON';
-        $this->query[] = implode(' ',$this->ON);
-
-        return $this;
-    }
-
-    public function getQuery()
-    {
-        return implode(' ', $this->query);
-    }
-
 
 }

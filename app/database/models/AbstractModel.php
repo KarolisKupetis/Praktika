@@ -11,6 +11,7 @@ abstract class AbstractModel
     private $password = 'qwer';
     private $dbname = 'hyphenator';
     protected $connection;
+    protected $tableName;
 
     protected function connect()
     {
@@ -30,42 +31,58 @@ abstract class AbstractModel
     protected function selectAll($tableName)
     {
         $this->connection = $this->connect();
-        $words = array();
-        $sql = 'SELECT * FROM' . " $tableName";
+        $rows = array();
+        $sql = new QueryBuilder();
+        $sql->
+        select()->
+        from($tableName);
+
         $stmt = $this->connection->query($sql);
 
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $words[] = $row;
+            $rows[] = $row;
         }
 
-        return $words;
+        return $rows;
     }
 
-    protected function selectByID($tableName, $id)
+    protected function selectBy($tableName,$searchSubject,$searchValue)
     {
         $this->connection = $this->connect();
-        $sql = 'SELECT * FROM ' . $tableName . ' WHERE id= ? ';
-        $stmt = $this->connection->prepare($sql);
-        $stmt->execute([$id]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $sql = new QueryBuilder();
+        $sql->
+        select()->
+        from($tableName)->
+        where('?', '=', '?');
 
-        return $result;
+        $stmt = $this->connection->prepare($sql);
+        $stmt->execute([$searchSubject,$searchValue]);
+
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     protected function truncateTable($tableName)
     {
+        $sql = new QueryBuilder();
+        $sql->
+        truncate($tableName);
+
         $this->connection = $this->connect();
-        $sql = 'TRUNCATE TABLE ' . $tableName . '';
         $stmt = $this->connection->prepare($sql);
         $stmt->execute([$tableName]);
     }
 
-    protected function deleteWhereID($tableName, $ID)
+    protected function deleteWhere($tableName,$fieldBy, $fieldValue,$condition='=')
     {
         $this->connection = $this->connect();
-        $sql = 'DELETE FROM ' . $tableName . ' WHERE ID= ?';
+        $sql = new QueryBuilder();
+        $sql->
+        delete()->
+        from($tableName)->
+        where('?','?', '?');
+
         $stmt = $this->connection->prepare($sql);
-        $stmt->execute([$ID]);
+        $stmt->execute([$fieldBy,$condition,$fieldValue]);
     }
 
 }
