@@ -46,7 +46,7 @@ abstract class AbstractModel
         return $rows;
     }
 
-    protected function selectBy($tableName,$searchSubject,$searchValue)
+    protected function selectBy($tableName, $searchSubject, $searchValue)
     {
         $this->connection = $this->connect();
         $sql = new QueryBuilder();
@@ -56,7 +56,7 @@ abstract class AbstractModel
         where('?', '=', '?');
 
         $stmt = $this->connection->prepare($sql);
-        $stmt->execute([$searchSubject,$searchValue]);
+        $stmt->execute([$searchSubject, $searchValue]);
 
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
@@ -72,17 +72,17 @@ abstract class AbstractModel
         $stmt->execute([$tableName]);
     }
 
-    protected function deleteWhere($tableName,$fieldBy, $fieldValue,$condition='=')
+    protected function deleteWhere($tableName, $fieldBy, $fieldValue, $condition = '=')
     {
         $this->connection = $this->connect();
         $sql = new QueryBuilder();
         $sql->
         delete()->
         from($tableName)->
-        where('?','?', '?');
+        where('?', '?', '?');
 
         $stmt = $this->connection->prepare($sql);
-        $stmt->execute([$fieldBy,$condition,$fieldValue]);
+        $stmt->execute([$fieldBy, $condition, $fieldValue]);
     }
 
 }

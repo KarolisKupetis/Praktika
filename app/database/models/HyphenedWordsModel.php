@@ -44,6 +44,7 @@ class HyphenedWordsModel extends AbstractModel
     public function getHyphenedWordBy($id = null, $wordId = null)
     {
         if ($id) {
+
             return $this->selectBy($this->tableName, 'id', $id);
 
         } elseif ($wordId) {

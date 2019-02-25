@@ -88,11 +88,11 @@ class QueryBuilder
         return $this;
     }
 
-    public function where($field1, $condition, $field2)
+    public function where($comparedColumn, $condition, $comparedTo)
     {
-        $this->query .= ' ' . $field1;
+        $this->query .= ' ' . $comparedColumn;
         $this->query .= ' ' . $condition;
-        $this->query .= ' ' . $field2;
+        $this->query .= ' ' . $comparedTo;
 
         return $this;
     }

@@ -45,8 +45,11 @@ class PatternsModel extends AbstractModel
     public function getPatternBy($pattern = null, $patternId = null)
     {
         if ($pattern) {
+
             return $this->selectBy($this->tableName, 'pattern', $pattern);
+
         } elseif ($patternId) {
+
             return $this->selectBy($this->tableName, 'ID', $patternId);
         }
 
