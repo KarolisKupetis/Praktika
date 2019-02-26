@@ -2,39 +2,23 @@
 
 namespace App\Controller;
 
-use App\database\models\HyphenedWordsModel;
-use App\database\models\PatternsModel;
-use App\database\models\PatternsWordsModel;
-use App\database\WordsModel;
-use App\Helper\FileReader;
 use App\Helper\InputLoader;
 use App\SourceStateMachine\DatabaseState;
 use App\SourceStateMachine\FileState;
 use Psr\Log\LoggerInterface;
 
-
 class NavigationController
 {
     private $inputLoader;
-    private $fileReader;
     private $sourceName;
     private $hyphenatorController;
     private $logger;
-    private $patternsModel;
-    private $wordsModel;
-    private $hyphenatedWordsModel;
-    private $patternsWordsModel;
 
     public function __construct(LoggerInterface $logger)
     {
-        $this->logger=$logger;
+        $this->logger = $logger;
         $this->inputLoader = new InputLoader();
-        $this->fileReader = new FileReader();
         $this->hyphenatorController = new HyphenationController($logger);
-        $this->wordsModel = new WordsModel();
-        $this->patternsModel = new PatternsModel();
-        $this->patternsWordsModel = new PatternsWordsModel();
-        $this->hyphenatedWordsModel = new HyphenedWordsModel();
     }
 
     public function beginWork()
@@ -55,9 +39,9 @@ class NavigationController
                 case 1:
                     echo 'Type in the word you want to hyphenate: ';
                     $inputWord = $this->inputLoader->getUserInput();
-                    $this->logger->info('Given word :'.$inputWord);
+                    $this->logger->info('Given word :' . $inputWord);
                     $result = $this->hyphenatorController->hyphenateWord($inputWord);
-                    $this->logger->info('Hyphened word :'.$result);
+                    $this->logger->info('Hyphened word :' . $result);
                     echo 'Hyphenated word: ' . $result . "\n";
                     break;
                 case 2:
@@ -92,8 +76,8 @@ class NavigationController
                 case 1:
                     echo 'Type in sentence :';
                     $sentence = $this->inputLoader->getUserInput();
-                    $this->logger->info('Given sentence'.$sentence);
-                    $resultSentence =$this->hyphenatorController->hyphenateSentence($sentence);
+                    $this->logger->info('Given sentence' . $sentence);
+                    $resultSentence = $this->hyphenatorController->hyphenateSentence($sentence);
                     echo $resultSentence;
                     break;
                 case 2:
@@ -120,20 +104,20 @@ class NavigationController
 
             switch ($command[0]) {
                 case 1:
-                    $patternsArray = $this->fileReader->readFile($command[1]);
-                    $this->patternsModel->truncatePatternsTable();
-                    $this->patternsWordsModel->truncatePatternsWordsTable();
-                    $this->hyphenatedWordsModel->truncateHyphenedWordsTable();
-                    $this->patternsModel->insertPatterns($patternsArray);
-                    echo "\n Data uploaded successfully \n";
+                    if ($command[1]) {
+                        $this->hyphenatorController->uploadPatterns($command[1]);
+                        echo "\n Data uploaded successfully \n";
+                    } else {
+                        echo "\n Specify filename \n";
+                    }
                     break;
                 case 2:
-                    $arrayOfWords = $this->fileReader->readFile($command[1]);
-                    $this->wordsModel->truncateWordsTable();
-                    $this->patternsWordsModel->truncatePatternsWordsTable();
-                    $this->hyphenatedWordsModel->truncateHyphenedWordsTable();
-                    $this->wordsModel->insertWords($arrayOfWords);
-                    echo "\n Data uploaded successfully \n";
+                    if ($command[1]) {
+                        $this->hyphenatorController->uploadWords($command[1]);
+                        echo "\n Data uploaded successfully \n";
+                    } else {
+                        echo "\n Specify filename \n";
+                    }
                     break;
                 case 3:
                     $run = false;
@@ -157,11 +141,11 @@ class NavigationController
                 case 1:
                     $filename = $command[1];
                     $this->sourceSelection(1, $filename);
-                    $run=false;
+                    $run = false;
                     break;
                 case 2:
                     $this->sourceSelection(2);
-                    $run=false;
+                    $run = false;
                     break;
                 case 3:
                     $run = false;
@@ -173,11 +157,11 @@ class NavigationController
     private function sourceSelection($option, $filename = null)
     {
         if ($option === 1) {
-            $this->hyphenatorController->setState(new FileState($filename,$this->logger));
+            $this->hyphenatorController->setState(new FileState($filename, $this->logger));
             $this->sourceName = 'File';
 
         } elseif ($option === 2) {
-           $this->hyphenatorController->setState(new DatabaseState($this->logger));
+            $this->hyphenatorController->setState(new DatabaseState($this->logger));
             $this->sourceName = 'Database';
         }
     }
