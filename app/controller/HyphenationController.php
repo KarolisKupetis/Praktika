@@ -2,11 +2,8 @@
 
 namespace App\Controller;
 
-use App\Helper\FileReader;
-use App\Helper\InputLoader;
 use App\Helper\TimeTracker;
 use App\SourceStateMachine\DatabaseState;
-use App\SourceStateMachine\NoState;
 use Psr\Log\LoggerInterface;
 
 class HyphenationController

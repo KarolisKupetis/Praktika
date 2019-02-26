@@ -10,35 +10,28 @@ class PatternsWordsModel extends AbstractModel
 {
     public function __construct()
     {
-        $this->connection = $this->connect();
+        parent::__construct();
         $this->tableName = 'patterns_words';
     }
 
-    public function findPatternsIDByWordID($wordId)
+    public function getPatternsIdsByWordID($wordId)
     {
         $patterns = array();
-        $sql = new QueryBuilder();
-        $sql->
-        select()->
-        from($this->tableName)->
-        where('word_id', '=', '?');
 
-        $stmt = $this->connection->prepare($sql);
-        $stmt->execute([$wordId]);
+        $rows = $this->selectAllBy($this->tableName, 'word_id', $wordId);
 
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $patterns[] = $row;
+        foreach ($rows as $row) {
+            $patterns[] = $row['pattern_id'];
         }
 
         return $patterns;
     }
 
-    public function insertPatternsWords($patternId, $wordId)
+    public function insertOneRow($patternId, $wordId)
     {
-
         $sql = new QueryBuilder();
         $sql->
-        insertIgnore($this->tableName, 'pattern_id, word_id')->
+        insert($this->tableName, 'pattern_id, word_id')->
         values('?,?');
 
         $stmt = $this->connection->prepare($sql);
@@ -50,8 +43,22 @@ class PatternsWordsModel extends AbstractModel
         $this->truncateTable($this->tableName);
     }
 
-    public function deleteRelationWhereWordID($wordID)
+    public function deleteWhereWordID($wordID)
     {
         $this->deleteWhere($this->tableName, 'word_id', $wordID);
     }
+
+    public function insertArrayOfPatternsWords(array $patterns, $wordId)
+    {
+        $sql = new QueryBuilder();
+        $sql->
+        insert($this->tableName, 'pattern_id, word_id')->
+        values('?,?');
+
+        foreach ($patterns as $pattern) {
+            $this->insertOneRow($pattern, $wordId);
+        }
+    }
+
+
 }

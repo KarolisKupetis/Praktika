@@ -8,10 +8,9 @@ use PDO;
 
 class PatternsModel extends AbstractModel
 {
-
     public function __construct()
     {
-        $this->connection = $this->connect();
+        parent::__construct();
         $this->tableName = 'patterns';
     }
 
@@ -32,9 +31,17 @@ class PatternsModel extends AbstractModel
         $this->connection->commit();
     }
 
-    public function getPatterns()
+    public function getAllPatterns()
     {
-        return $this->selectAll($this->tableName);
+        $rows =  $this->selectAll($this->tableName);
+        $patterns = array();
+
+        foreach ($rows as $row)
+        {
+            $patterns[]=$row['pattern'];
+        }
+
+        return $patterns;
     }
 
     public function truncatePatternsTable()
@@ -42,17 +49,17 @@ class PatternsModel extends AbstractModel
         $this->truncateTable($this->tableName);
     }
 
-    public function getPatternBy($pattern = null, $patternId = null)
+    public function getPatternByID($patternId)
     {
-        if ($pattern) {
+        $tableRow = $this->getFirstOccurrenceBy($this->tableName, 'ID', $patternId);
 
-            return $this->selectBy($this->tableName, 'pattern', $pattern);
+        return $tableRow['pattern'];
+    }
 
-        } elseif ($patternId) {
+    public function getPatternIDByPattern($pattern)
+    {
+        $tableRow = $this->getFirstOccurrenceBy($this->tableName, 'pattern', $pattern);
 
-            return $this->selectBy($this->tableName, 'ID', $patternId);
-        }
-
-        return null;
+        return $tableRow['ID'];
     }
 }

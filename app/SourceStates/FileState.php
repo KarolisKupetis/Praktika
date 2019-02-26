@@ -3,9 +3,7 @@
 namespace App\SourceStateMachine;
 
 use App\Controller\Hyphenator;
-use App\database\DatabaseController;
 use App\Helper\FileReader;
-use App\Helper\InputLoader;
 use Psr\Log\LoggerInterface;
 
 class FileState implements StateInterface
@@ -20,7 +18,7 @@ class FileState implements StateInterface
         $this->logger=$logger;
         $this->fileReader=new FileReader();
         $this->hyphenator= new Hyphenator();
-        $this->patterns= $this->setPatterns($filename);
+        $this->patterns= $this->getPatternsFromFile($filename);
     }
 
     public function hyphenateWord($inputWord)
@@ -29,10 +27,9 @@ class FileState implements StateInterface
         return $this->hyphenator->hyphenateWord($inputWord,$this->patterns);
     }
 
-    private function setPatterns($fileName)
+    private function getPatternsFromFile($fileName)
     {
          return $this->fileReader->readFile($fileName);
-
     }
 
     public function hyphenateSentence($sentence)

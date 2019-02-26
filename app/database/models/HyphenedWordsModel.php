@@ -10,30 +10,37 @@ class HyphenedWordsModel extends AbstractModel
 {
     public function __construct()
     {
-        $this->connection = $this->connect();
+        parent::__construct();
         $this->tableName = 'hyphened_words';
     }
 
     public function insertHyphenedWord($hyphenedWord, $wordID)
     {
-
         $sql = new QueryBuilder();
         $sql->
-        insertIgnore($this->tableName, 'hyphened_word,word_id')->
-        values('?,?');
+        insertIgnore($this->tableName, 'hyphened_word, word_id')->
+        values('? , ?');
 
         $stmt = $this->connection->prepare($sql);
         $stmt->execute([$hyphenedWord, $wordID]);
     }
 
-    public function truncateHyphened_wordsTable()
+    public function truncateHyphenedWordsTable()
     {
         $this->truncateTable($this->tableName);
     }
 
     public function getAllHyphenedWords()
     {
-        return $this->selectAll($this->tableName);
+        $hyphenatedWords = array();
+        $rows =  $this->selectAll($this->tableName);
+
+        foreach ($rows as $row)
+        {
+            $hyphenatedWords[] = $row['hyphened_word'];
+        }
+
+        return $hyphenatedWords;
     }
 
     public function deleteByID($id)
@@ -41,17 +48,17 @@ class HyphenedWordsModel extends AbstractModel
         $this->deleteWhere($this->tableName, 'ID', $id);
     }
 
-    public function getHyphenedWordBy($id = null, $wordId = null)
+    public function getHyphenedWordById($id)
     {
-        if ($id) {
+        $tableRow =  $this->getFirstOccurrenceBy($this->tableName, 'ID', $id);
 
-            return $this->selectBy($this->tableName, 'id', $id);
+        return $tableRow['hyphened_word'];
+    }
 
-        } elseif ($wordId) {
+    public function getHyphenedWordByWordId($wordId)
+    {
+        $tableRow =  $this->getFirstOccurrenceBy($this->tableName, 'word_id', $wordId);
 
-            return $this->selectBy($this->tableName, 'word_id', $wordId);
-        }
-
-        return null;
+        return $tableRow['hyphened_word'];
     }
 }

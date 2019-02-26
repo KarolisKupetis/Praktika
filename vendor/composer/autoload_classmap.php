@@ -6,7 +6,7 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'App\\API\\APIController' => $baseDir . '/app/api/APIController.php',
+    'App\\Controller\\APIController' => $baseDir . '/app/controller/APIController.php',
     'App\\Controller\\HyphenationController' => $baseDir . '/app/controller/HyphenationController.php',
     'App\\Controller\\Hyphenator' => $baseDir . '/app/controller/Hyphenator.php',
     'App\\Controller\\NavigationController' => $baseDir . '/app/controller/NavigationController.php',
@@ -19,7 +19,7 @@ return array(
     'App\\SourceStateMachine\\FileState' => $baseDir . '/app/SourceStates/FileState.php',
     'App\\SourceStateMachine\\StateInterface' => $baseDir . '/app/SourceStates/StateInterface.php',
     'App\\database\\AbstractModel' => $baseDir . '/app/database/models/AbstractModel.php',
-    'App\\database\\DatabaseController' => $baseDir . '/app/controller/DatabaseController.php',
+    'App\\database\\Connection' => $baseDir . '/app/database/Connection.php',
     'App\\database\\QueryBuilder' => $baseDir . '/app/database/QueryBuilder.php',
     'App\\database\\WordsModel' => $baseDir . '/app/database/models/WordsModel.php',
     'App\\database\\models\\HyphenedWordsModel' => $baseDir . '/app/database/models/HyphenedWordsModel.php',

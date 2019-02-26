@@ -13,9 +13,9 @@ class QueryBuilder
         return $this;
     }
 
-    public function select($fields = null)
+    public function select($fields = '*')
     {
-        if ($fields === null || $fields === '') {
+        if ($fields === '') {
             $fields = '*';
         }
 
@@ -64,6 +64,20 @@ class QueryBuilder
         return $this;
     }
 
+    public function update($tableName)
+    {
+        $this->query.='UPDATE '.$tableName;
+
+        return $this;
+    }
+
+    public function set($fields)
+    {
+        $this->query.=' SET '.$fields;
+
+        return $this;
+    }
+
     public function on($tableField, $statement, $joinTableField)
     {
         $this->query .= ' ON';
@@ -90,6 +104,7 @@ class QueryBuilder
 
     public function where($comparedColumn, $condition, $comparedTo)
     {
+        $this->query .= ' WHERE ';
         $this->query .= ' ' . $comparedColumn;
         $this->query .= ' ' . $condition;
         $this->query .= ' ' . $comparedTo;

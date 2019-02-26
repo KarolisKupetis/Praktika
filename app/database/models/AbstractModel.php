@@ -6,59 +6,55 @@ use PDO;
 
 abstract class AbstractModel
 {
-    private $host = 'localhost';
-    private $user = 'root';
-    private $password = 'qwer';
-    private $dbname = 'hyphenator';
     protected $connection;
     protected $tableName;
 
-    protected function connect()
+    protected function __construct()
     {
-        $this->connection = null;
-
-        try {
-            $source = 'mysql:host=' . $this->host . ';dbname=' . $this->dbname;
-            $this->connection = new \PDO($source, $this->user, $this->password);
-            $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        } catch (\PDOException $e) {
-            echo 'Connection error: ' . $e->getMessage();
-        }
-
-        return $this->connection;
+        $this->connection=Connection::getInstance()->getConnection();
     }
 
     protected function selectAll($tableName)
     {
-        $this->connection = $this->connect();
-        $rows = array();
         $sql = new QueryBuilder();
         $sql->
         select()->
         from($tableName);
 
         $stmt = $this->connection->query($sql);
-
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $rows[] = $row;
-        }
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         return $rows;
     }
 
-    protected function selectBy($tableName, $searchSubject, $searchValue)
+    protected function getFirstOccurrenceBy($tableName, $searchSubject, $searchValue, $condition = '=')
     {
-        $this->connection = $this->connect();
         $sql = new QueryBuilder();
         $sql->
         select()->
         from($tableName)->
-        where('?', '=', '?');
+        where($searchSubject, $condition, '?');
 
         $stmt = $this->connection->prepare($sql);
-        $stmt->execute([$searchSubject, $searchValue]);
+        $stmt->execute([$searchValue]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    protected function selectAllBy($tableName, $searchSubject, $searchValue, $condition = '=')
+    {
+        $sql = new QueryBuilder();
+        $sql->
+        select()->
+        from($tableName)->
+        where($searchSubject, $condition, '?');
+
+        $stmt = $this->connection->prepare($sql);
+        $stmt->execute([$searchValue]);
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return $result;
     }
 
     protected function truncateTable($tableName)
@@ -67,22 +63,19 @@ abstract class AbstractModel
         $sql->
         truncate($tableName);
 
-        $this->connection = $this->connect();
-        $stmt = $this->connection->prepare($sql);
-        $stmt->execute([$tableName]);
+        $this->connection->exec($sql);
     }
 
     protected function deleteWhere($tableName, $fieldBy, $fieldValue, $condition = '=')
     {
-        $this->connection = $this->connect();
+
         $sql = new QueryBuilder();
         $sql->
         delete()->
         from($tableName)->
-        where('?', '?', '?');
+        where($fieldBy, $condition, '?');
 
         $stmt = $this->connection->prepare($sql);
-        $stmt->execute([$fieldBy, $condition, $fieldValue]);
+        $stmt->execute([$fieldValue]);
     }
-
 }

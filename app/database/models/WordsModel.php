@@ -8,7 +8,7 @@ class WordsModel extends AbstractModel
 {
     public function __construct()
     {
-        $this->connection = $this->connect();
+        parent::__construct();
         $this->tableName = 'words';
     }
 
@@ -20,7 +20,7 @@ class WordsModel extends AbstractModel
         values('?');
 
         $stmt = $this->connection->prepare($sql);
-        $stmt->execute($word);
+        $stmt->execute([$word]);
     }
 
     public function insertWords(array $wordsArray)
@@ -42,17 +42,22 @@ class WordsModel extends AbstractModel
 
     public function getWords()
     {
-        return $this->selectAll('words');
+        $rows = $this->selectAll('words');
+        $words = array();
+
+        foreach ($rows as $row)
+        {
+            $words[]=$row['word'];
+        }
+
+        return $words;
     }
 
     public function getWordByID($id)
     {
-        return $this->selectBy($this->tableName, 'word_id', $id);
-    }
+        $tableRow = $this->getFirstOccurrenceBy($this->tableName, 'ID', $id);
 
-    public function getWordByWord($word)
-    {
-        return $this->selectBy($this->tableName, 'word', $word);
+        return $tableRow['word'];
     }
 
     public function truncateWordsTable()
@@ -62,6 +67,25 @@ class WordsModel extends AbstractModel
 
     public function deleteWordWhereID($wordID)
     {
-        $this->deleteWhere($this->tableName, 'word_id', $wordID);
+        $this->deleteWhere($this->tableName, 'ID', $wordID);
+    }
+
+    public function getWordIdByWord($word)
+    {
+        $wordTableRow = $this->getFirstOccurrenceBy($this->tableName, 'word', $word);
+
+        return $wordTableRow['ID'];
+    }
+
+    public function updateWordWhereID($wordId,$newWord)
+    {
+        $sql = new QueryBuilder();
+        $sql ->
+        update($this->tableName)->
+        set('word = ?')->
+        where('ID','=','?');
+
+        $stmt = $this->connection->prepare($sql);
+        $stmt->execute([$newWord,$wordId]);
     }
 }
