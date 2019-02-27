@@ -1,14 +1,17 @@
 <?php
 
-namespace App\database;
+namespace App\database\models;
 
-use PDO;
+use App\database\AbstractModel;
+use App\database\Connection;
+use App\database\QueryBuilder;
+use mysql_xdevapi\Exception;
 
 class WordsModel extends AbstractModel
 {
-    public function __construct()
+    public function __construct(Connection $dbConnection)
     {
-        parent::__construct();
+        parent::__construct($dbConnection);
         $this->tableName = 'words';
     }
 
@@ -31,23 +34,30 @@ class WordsModel extends AbstractModel
         values('?');
 
         $insertStatement = $this->connection->prepare($sql);
-        $this->connection->beginTransaction();
 
-        foreach ($wordsArray as $row) {
-            $insertStatement->execute([$row]);
+        $this->connection->beginTransaction();
+        try {
+
+            foreach ($wordsArray as $row) {
+                $insertStatement->execute([$row]);
+            }
+            $this->connection->commit();
+
+        } catch (Exception $e) {
+            $this->connection->rollBack();
+
+            echo 'Failed to upload words';
         }
 
-        $this->connection->commit();
     }
 
     public function getWords()
     {
-        $rows = $this->selectAll('words');
+        $wordsRows = $this->selectAll('words');
         $words = array();
 
-        foreach ($rows as $row)
-        {
-            $words[]=$row['word'];
+        foreach ($wordsRows as $wordRow) {
+            $words[] = $wordRow['word'];
         }
 
         return $words;
@@ -55,7 +65,7 @@ class WordsModel extends AbstractModel
 
     public function getWordByID($id)
     {
-        $tableRow = $this->getFirstOccurrenceBy($this->tableName, 'ID', $id);
+        $tableRow = $this->getFirstOccurrenceWhere($this->tableName, 'ID', $id);
 
         return $tableRow['word'];
     }
@@ -72,20 +82,20 @@ class WordsModel extends AbstractModel
 
     public function getWordIdByWord($word)
     {
-        $wordTableRow = $this->getFirstOccurrenceBy($this->tableName, 'word', $word);
+        $wordTableRow = $this->getFirstOccurrenceWhere($this->tableName, 'word', $word);
 
         return $wordTableRow['ID'];
     }
 
-    public function updateWordWhereID($wordId,$newWord)
+    public function updateWordWhereID($wordId, $newWord)
     {
         $sql = new QueryBuilder();
-        $sql ->
+        $sql->
         update($this->tableName)->
         set('word = ?')->
-        where('ID','=','?');
+        where('ID', '=', '?');
 
         $stmt = $this->connection->prepare($sql);
-        $stmt->execute([$newWord,$wordId]);
+        $stmt->execute([$newWord, $wordId]);
     }
 }

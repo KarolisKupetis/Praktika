@@ -6,11 +6,11 @@ class TimeTracker implements TimeTrackInterface
 {
     private $startTime;
     private $endTime;
-    private $timePassed=0;
+    private $timePassed = 0;
 
     public function startTrackingTime()
     {
-       $this->startTime= microtime(true);
+        $this->startTime = microtime(true);
     }
 
     public function endTrackingTime()
@@ -20,7 +20,7 @@ class TimeTracker implements TimeTrackInterface
 
     public function getElapsedTime()
     {
-        return number_format($this->timePassed =($this->endTime-$this->startTime),6);
+        return number_format($this->timePassed = ($this->endTime - $this->startTime), 6);
     }
 
     public static function currentTime()

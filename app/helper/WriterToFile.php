@@ -5,7 +5,7 @@ class WriterToFile
 {
     public function writeStringToFile($string)
     {
-        $file = new \SplFileObject('result.txt', 'a+');
+        $file = new \SplFileObject('resultNotTree.txt', 'a+');
         $file->fwrite($string);
     }
 }

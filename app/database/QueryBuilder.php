@@ -66,14 +66,14 @@ class QueryBuilder
 
     public function update($tableName)
     {
-        $this->query.='UPDATE '.$tableName;
+        $this->query .= 'UPDATE ' . $tableName;
 
         return $this;
     }
 
     public function set($fields)
     {
-        $this->query.=' SET '.$fields;
+        $this->query .= ' SET ' . $fields;
 
         return $this;
     }

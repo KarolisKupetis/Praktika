@@ -21,21 +21,22 @@ class Hyphenator
         return $foundPosition;
     }
 
-    public function hyphenateWord($input, $patternsArray)
+    public function hyphenateWord($input, $patternTree)
     {
-        $inputWithDots = '.' . $input . '.';
-        $inputAsArray = str_split(implode(' ', str_split($inputWithDots)));
+        $inputWithAddedDots = '.' . $input . '.';
+        $inputAsArray = str_split(implode(' ', str_split($inputWithAddedDots)));
         $this->usedPatterns= array();
+        $patternsArray=$this->getMatchingPatterns($patternTree, $inputWithAddedDots);
 
         foreach ($patternsArray as $syllable) {
 
-            $syllablePosition = $this->findSyllablePositionInWord($inputWithDots, $syllable);
+            $syllablePosition = $this->findSyllablePositionInWord($inputWithAddedDots, $syllable);
 
             while ($syllablePosition !== false) {
                 $this->usedPatterns[]=$syllable;
                 $spaceIndexInWord = $syllablePosition * 2 + 1;
                 $inputAsArray = $this->updateArrayNumbers($spaceIndexInWord, $inputAsArray, $syllable);
-                $syllablePosition = $this->findSyllablePositionInWord($inputWithDots, $syllable, $syllablePosition + 1);
+                $syllablePosition = $this->findSyllablePositionInWord($inputWithAddedDots, $syllable, $syllablePosition + 1);
             }
         }
 
@@ -97,5 +98,29 @@ class Hyphenator
     public function getUsedPatterns()
     {
         return $this->usedPatterns;
+    }
+
+    private function getMatchingPatterns($patternTree, $inputWord)
+    {
+        $matches = array();
+        $wordLength = strlen($inputWord);
+
+        for ($i = 0; $i < $wordLength - 2; $i++) {
+            if (isset($patternTree[$inputWord[$i]][$inputWord[$i + 1]][$inputWord[$i + 2]])) {
+
+                foreach ($patternTree[$inputWord[$i]][$inputWord[$i + 1]][$inputWord[$i + 2]] as $item) {
+                    $matches[] =$item;
+                }
+            }
+
+            if (isset($patternTree[$inputWord[$i]][$inputWord[$i + 1]][0])){
+
+                foreach ($patternTree[$inputWord[$i]][$inputWord[$i + 1]][0] as $item) {
+                    $matches[] =$item;
+                }
+            }
+        }
+
+        return $matches;
     }
 }

@@ -3,14 +3,14 @@
 namespace App\database\models;
 
 use App\database\AbstractModel;
+use App\database\Connection;
 use App\database\QueryBuilder;
-use PDO;
 
 class PatternsWordsModel extends AbstractModel
 {
-    public function __construct()
+    public function __construct(Connection $dbConnection)
     {
-        parent::__construct();
+        parent::__construct($dbConnection);
         $this->tableName = 'patterns_words';
     }
 
@@ -18,9 +18,9 @@ class PatternsWordsModel extends AbstractModel
     {
         $patterns = array();
 
-        $rows = $this->selectAllBy($this->tableName, 'word_id', $wordId);
+        $patternsWordsRows = $this->selectAllWhere($this->tableName, 'word_id', $wordId);
 
-        foreach ($rows as $row) {
+        foreach ($patternsWordsRows as $row) {
             $patterns[] = $row['pattern_id'];
         }
 

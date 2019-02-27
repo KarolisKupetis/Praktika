@@ -2,19 +2,19 @@
 
 namespace App\Controller;
 
+use App\database\Connection;
 use App\database\models\HyphenedWordsModel;
-use App\database\WordsModel;
-use Psr\Log\LoggerInterface;
+use App\database\models\WordsModel;
 
 class APIController
 {
     private $wordsModel;
     private $hyphenatedWordsModel;
 
-    public function __construct()
+    public function __construct(Connection $dbConnection)
     {
-        $this->wordsModel = new WordsModel();
-        $this->hyphenatedWordsModel = new HyphenedWordsModel();
+        $this->wordsModel = new WordsModel($dbConnection);
+        $this->hyphenatedWordsModel = new HyphenedWordsModel($dbConnection);
     }
 
     public function requestFunction()

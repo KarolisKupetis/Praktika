@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use App\database\Connection;
 use App\Helper\InputLoader;
+use App\Helper\TimeTracker;
 use App\SourceStateMachine\DatabaseState;
 use App\SourceStateMachine\FileState;
 use Psr\Log\LoggerInterface;
@@ -13,12 +15,16 @@ class NavigationController
     private $sourceName;
     private $hyphenatorController;
     private $logger;
+    private $dbController;
+    private $timeTracker;
 
-    public function __construct(LoggerInterface $logger)
+    public function __construct(LoggerInterface $logger, Connection $dbController)
     {
+        $this->dbController = $dbController;
         $this->logger = $logger;
         $this->inputLoader = new InputLoader();
-        $this->hyphenatorController = new HyphenationController($logger);
+        $this->hyphenatorController = new HyphenationController($logger, $dbController);
+        $this->timeTracker = new TimeTracker();
     }
 
     public function beginWork()
@@ -82,7 +88,11 @@ class NavigationController
                     break;
                 case 2:
                     $filename = $command[1];
-                    $this->hyphenatorController->hyphenateFile($filename);
+                    $this->timeTracker->startTrackingTime();
+                    $result = $this->hyphenatorController->hyphenateFile($filename);
+                    $this->timeTracker->endTrackingTime();
+                    echo $this->timeTracker->getElapsedTime();
+                    //print_r($result);  // uncomment to see results. Commented just for faster results.
                     break;
                 case 3:
                     $run = false;
@@ -161,7 +171,7 @@ class NavigationController
             $this->sourceName = 'File';
 
         } elseif ($option === 2) {
-            $this->hyphenatorController->setState(new DatabaseState($this->logger));
+            $this->hyphenatorController->setState(new DatabaseState($this->logger, $this->dbController));
             $this->sourceName = 'Database';
         }
     }

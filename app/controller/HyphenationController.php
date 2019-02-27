@@ -2,10 +2,11 @@
 
 namespace App\Controller;
 
+use App\database\Connection;
 use App\database\models\HyphenedWordsModel;
 use App\database\models\PatternsModel;
 use App\database\models\PatternsWordsModel;
-use App\database\WordsModel;
+use App\database\models\WordsModel;
 use App\Helper\FileReader;
 use App\Helper\TimeTracker;
 use App\SourceStateMachine\DatabaseState;
@@ -22,16 +23,16 @@ class HyphenationController
     private $hyphenatedWordsModel;
     private $patternsWordsModel;
 
-    public function __construct(LoggerInterface $logger)
+    public function __construct(LoggerInterface $logger, Connection $dbConnection)
     {
         $this->logger = $logger;
         $this->timeTracker = new TimeTracker();
         $this->fileReader = new FileReader();
-        $this->state = new DatabaseState($logger);
-        $this->wordsModel = new WordsModel();
-        $this->patternsModel = new PatternsModel();
-        $this->patternsWordsModel = new PatternsWordsModel();
-        $this->hyphenatedWordsModel = new HyphenedWordsModel();
+        $this->state = new DatabaseState($logger,$dbConnection);
+        $this->wordsModel = new WordsModel($dbConnection);
+        $this->patternsModel = new PatternsModel($dbConnection);
+        $this->patternsWordsModel = new PatternsWordsModel($dbConnection);
+        $this->hyphenatedWordsModel = new HyphenedWordsModel($dbConnection);
     }
 
     public function hyphenateWord($inputWord)

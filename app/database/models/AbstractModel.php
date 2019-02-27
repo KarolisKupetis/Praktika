@@ -9,9 +9,9 @@ abstract class AbstractModel
     protected $connection;
     protected $tableName;
 
-    protected function __construct()
+    protected function __construct(Connection $dbConnection)
     {
-        $this->connection=Connection::getInstance()->getConnection();
+        $this->connection = $dbConnection->getConnection();
     }
 
     protected function selectAll($tableName)
@@ -27,7 +27,7 @@ abstract class AbstractModel
         return $rows;
     }
 
-    protected function getFirstOccurrenceBy($tableName, $searchSubject, $searchValue, $condition = '=')
+    protected function getFirstOccurrenceWhere($tableName, $searchSubject, $searchValue, $condition = '=')
     {
         $sql = new QueryBuilder();
         $sql->
@@ -42,7 +42,7 @@ abstract class AbstractModel
         return $result;
     }
 
-    protected function selectAllBy($tableName, $searchSubject, $searchValue, $condition = '=')
+    protected function selectAllWhere($tableName, $searchSubject, $searchValue, $condition = '=')
     {
         $sql = new QueryBuilder();
         $sql->

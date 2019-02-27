@@ -7,8 +7,9 @@ use App\database\Connection;
 use App\database\models\HyphenedWordsModel;
 use App\database\models\PatternsModel;
 use App\database\models\PatternsWordsModel;
-use App\database\WordsModel;
+use App\database\models\WordsModel;
 use App\Helper\FileReader;
+use mysql_xdevapi\Exception;
 use Psr\Log\LoggerInterface;
 
 class DatabaseState implements StateInterface
@@ -21,17 +22,19 @@ class DatabaseState implements StateInterface
     private $patternsModel;
     private $patternsWordsModel;
     private $hyphenedWordsModel;
+    private $patternTree;
 
-    public function __construct(LoggerInterface $logger)
+    public function __construct(LoggerInterface $logger,Connection $dbConnection)
     {
         $this->logger = $logger;
         $this->hyphenator = new Hyphenator();
         $this->fileReader = new FileReader();
-        $this->wordsModel = new WordsModel();
-        $this->patternsModel = new PatternsModel();
-        $this->patternsWordsModel = new PatternsWordsModel();
-        $this->hyphenedWordsModel = new HyphenedWordsModel();
+        $this->wordsModel = new WordsModel($dbConnection);
+        $this->patternsModel = new PatternsModel($dbConnection);
+        $this->patternsWordsModel = new PatternsWordsModel($dbConnection);
+        $this->hyphenedWordsModel = new HyphenedWordsModel($dbConnection);
         $this->patterns = $this->patternsModel->getAllPatterns();
+        $this->patternTree = $this->getPatternTree($this->patterns);
     }
 
     public function hyphenateWord($inputWord)
@@ -82,7 +85,7 @@ class DatabaseState implements StateInterface
 
     private function hyphenateNewWord($inputWord)
     {
-        $hyphenedWord = $this->hyphenator->hyphenateWord($inputWord, $this->patterns);
+        $hyphenedWord = $this->hyphenator->hyphenateWord($inputWord, $this->patternTree);
         $usedPatterns = $this->hyphenator->getUsedPatterns();
         $usedPatterns = array_unique($usedPatterns);
 
@@ -144,7 +147,7 @@ class DatabaseState implements StateInterface
 
     private function hyphenateOneWordFromSentence($word)
     {
-        return $this->hyphenator->hyphenateWord($word, $this->patterns);
+        return $this->hyphenator->hyphenateWord($word, $this->patternTree);
     }
 
     private function saveHyphenationToDB($usedPatterns, $inputWord, $hyphenedWord)
@@ -152,11 +155,18 @@ class DatabaseState implements StateInterface
         $connection = Connection::getInstance()->getConnection();
         $connection->beginTransaction();
 
-        $wordId = $this->insertWord($inputWord);
-        $this->insertPatternsWords($usedPatterns,$wordId);
-        $this->hyphenedWordsModel->insertHyphenedWord($hyphenedWord, $wordId);
+        try{
 
-        $connection->commit();
+            $wordId = $this->insertWord($inputWord);
+            $this->insertPatternsWords($usedPatterns,$wordId);
+            $this->hyphenedWordsModel->insertHyphenedWord($hyphenedWord, $wordId);
+            $connection->commit();
+
+        }catch (Exception $e){
+            $connection->rollBack();
+
+            echo 'Transaction failed';
+        }
     }
 
     private function insertPatternsWords($usedPatterns,$wordId)
@@ -182,5 +192,19 @@ class DatabaseState implements StateInterface
         }
 
         return $wordId;
+    }
+
+    public function getPatternTree($patterns)
+    {
+        $tree[] = array();
+        foreach ($patterns as $pattern) {
+            $letterPattern = preg_replace('/\d/', '', $pattern);
+            if (isset($letterPattern[2])) {
+                $tree[$letterPattern[0]][$letterPattern[1]][$letterPattern[2]][] = $pattern;
+            } else {
+                $tree[$letterPattern[0]][$letterPattern[1]][0][] = $pattern;
+            }
+        }
+        return $tree;
     }
 }

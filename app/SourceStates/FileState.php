@@ -12,6 +12,7 @@ class FileState implements StateInterface
     private $patterns;
     private $hyphenator;
     private $logger;
+    private $patternTree;
 
     public function __construct($filename,LoggerInterface $logger)
     {
@@ -19,12 +20,13 @@ class FileState implements StateInterface
         $this->fileReader=new FileReader();
         $this->hyphenator= new Hyphenator();
         $this->patterns= $this->getPatternsFromFile($filename);
+        $this->patternTree=$this->getPatternTree($this->patterns);
     }
 
     public function hyphenateWord($inputWord)
     {
 
-        return $this->hyphenator->hyphenateWord($inputWord,$this->patterns);
+        return $this->hyphenator->hyphenateWord($inputWord,$this->patternTree);
     }
 
     private function getPatternsFromFile($fileName)
@@ -45,7 +47,7 @@ class FileState implements StateInterface
         }
 
         $result = implode($hyphenedSentence) . "\n";
-        $this->logger->info('Hyphened sentence' . $result);
+        $this->logger->info('Hyphened sentence:  ' . $result);
 
         return $result;
     }
@@ -53,14 +55,14 @@ class FileState implements StateInterface
     public function hyphenateFile($fileName)
     {
         $fileContent = $this->fileReader->readFile($fileName);
-        $result = '';
+        $result = array();
 
         foreach ($fileContent as $sentence) {
             $hyphenedSentence = $this->hyphenateSentence($sentence);
-            $result .= $hyphenedSentence;
+            $result[] = $hyphenedSentence;
         }
 
-        return $result;
+       return $result;
     }
 
     private function isWord($subject)
@@ -75,7 +77,21 @@ class FileState implements StateInterface
 
     private function hyphenateOneWordFromSentence($word)
     {
-        return $this->hyphenator->hyphenateWord($word, $this->patterns);
+        return $this->hyphenator->hyphenateWord($word, $this->patternTree);
+    }
+
+    public function getPatternTree($patterns)
+    {
+        $tree[] = array();
+        foreach ($patterns as $pattern) {
+            $letterPattern = preg_replace('/\d/', '', $pattern);
+            if (isset($letterPattern[2])) {
+                $tree[$letterPattern[0]][$letterPattern[1]][$letterPattern[2]][] = $pattern;
+            } else {
+                $tree[$letterPattern[0]][$letterPattern[1]][0][] = $pattern;
+            }
+        }
+        return $tree;
     }
 
 }

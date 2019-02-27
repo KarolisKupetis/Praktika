@@ -3,14 +3,14 @@
 namespace App\database\models;
 
 use App\database\AbstractModel;
+use App\database\Connection;
 use App\database\QueryBuilder;
-use PDO;
 
 class PatternsModel extends AbstractModel
 {
-    public function __construct()
+    public function __construct(Connection $dbConnection)
     {
-        parent::__construct();
+        parent::__construct($dbConnection);
         $this->tableName = 'patterns';
     }
 
@@ -33,12 +33,11 @@ class PatternsModel extends AbstractModel
 
     public function getAllPatterns()
     {
-        $rows =  $this->selectAll($this->tableName);
+        $rows = $this->selectAll($this->tableName);
         $patterns = array();
 
-        foreach ($rows as $row)
-        {
-            $patterns[]=$row['pattern'];
+        foreach ($rows as $row) {
+            $patterns[] = $row['pattern'];
         }
 
         return $patterns;
@@ -51,14 +50,14 @@ class PatternsModel extends AbstractModel
 
     public function getPatternByID($patternId)
     {
-        $tableRow = $this->getFirstOccurrenceBy($this->tableName, 'ID', $patternId);
+        $tableRow = $this->getFirstOccurrenceWhere($this->tableName, 'ID', $patternId);
 
         return $tableRow['pattern'];
     }
 
     public function getPatternIDByPattern($pattern)
     {
-        $tableRow = $this->getFirstOccurrenceBy($this->tableName, 'pattern', $pattern);
+        $tableRow = $this->getFirstOccurrenceWhere($this->tableName, 'pattern', $pattern);
 
         return $tableRow['ID'];
     }

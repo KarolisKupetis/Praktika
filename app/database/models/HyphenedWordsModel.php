@@ -3,14 +3,14 @@
 namespace App\database\models;
 
 use App\database\AbstractModel;
+use App\database\Connection;
 use App\database\QueryBuilder;
-use PDO;
 
 class HyphenedWordsModel extends AbstractModel
 {
-    public function __construct()
+    public function __construct(Connection $dbConnection)
     {
-        parent::__construct();
+        parent::__construct($dbConnection);
         $this->tableName = 'hyphened_words';
     }
 
@@ -33,11 +33,10 @@ class HyphenedWordsModel extends AbstractModel
     public function getAllHyphenedWords()
     {
         $hyphenatedWords = array();
-        $rows =  $this->selectAll($this->tableName);
+        $hyphenedWordRows = $this->selectAll($this->tableName);
 
-        foreach ($rows as $row)
-        {
-            $hyphenatedWords[] = $row['hyphened_word'];
+        foreach ($hyphenedWordRows as $HyphenedWordRow) {
+            $hyphenatedWords[] = $HyphenedWordRow['hyphened_word'];
         }
 
         return $hyphenatedWords;
@@ -50,14 +49,14 @@ class HyphenedWordsModel extends AbstractModel
 
     public function getHyphenedWordById($id)
     {
-        $tableRow =  $this->getFirstOccurrenceBy($this->tableName, 'ID', $id);
+        $tableRow = $this->getFirstOccurrenceWhere($this->tableName, 'ID', $id);
 
         return $tableRow['hyphened_word'];
     }
 
     public function getHyphenedWordByWordId($wordId)
     {
-        $tableRow =  $this->getFirstOccurrenceBy($this->tableName, 'word_id', $wordId);
+        $tableRow = $this->getFirstOccurrenceWhere($this->tableName, 'word_id', $wordId);
 
         return $tableRow['hyphened_word'];
     }

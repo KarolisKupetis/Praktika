@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: vismauser2
- * Date: 19.2.26
- * Time: 14.01
- */
 
 namespace App\database;
 
@@ -12,9 +6,8 @@ use PDO;
 
 class Connection
 {
-    private static $instance ;
+    private static $instance;
     private $connection;
-
     private $host = 'localhost';
     private $user = 'root';
     private $password = 'qwer';
@@ -35,7 +28,7 @@ class Connection
 
     public static function getInstance()
     {
-        if(!isset(self::$instance)) {
+        if (!isset(self::$instance)) {
             self::$instance = new Connection();
         }
 
